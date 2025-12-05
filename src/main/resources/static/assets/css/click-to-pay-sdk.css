@@ -1,0 +1,1021 @@
+#src {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 1.2rem;
+    font-weight: 400;
+    font-family: Courier New, monospace;
+}
+
+#src td,
+#src th {
+    border: 0px solid #fff;
+    padding: 8px;
+}
+
+#src tr {
+    background-color: #fff;
+    vertical-align: top;
+}
+
+#src th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #e87600 !important;
+    color: white;
+}
+
+#srcForSonic {
+    border-collapse: collapse;
+    width: 100%;
+    height: 50%;
+    font-size: 1.2rem;
+    font-weight: 400;
+    font-family: Courier New, monospace;
+}
+
+#srcForSonic td,
+#srcForSonic th {
+    border: 0px solid #fff;
+    padding: 8px;
+}
+
+#srcForSonic tr {
+    background-color: #fff;
+    vertical-align: top;
+}
+
+#srcForSonic th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #e87600 !important;
+    color: white;
+}
+
+.blink {
+    animation: blinker 2s linear infinite;
+    color: #1c87c9;
+    font-size: 15px;
+    font-weight: normal;
+    font-family: sans-serif;
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0;
+    }
+}
+
+.blink-one {
+    animation: blinker-one 1s linear infinite;
+}
+
+@keyframes blinker-one {
+    0% {
+        opacity: 0;
+    }
+}
+
+.blink-two {
+    animation: blinker-two 1.4s linear infinite;
+    color: red;
+}
+
+@keyframes blinker-two {
+    100% {
+        opacity: 0;
+    }
+}
+
+textarea {
+    width: 100%;
+    writing-mode: horizontal-tb !important;
+    font-family: Courier New, monospace;
+    text-rendering: auto;
+    color: fieldtext;
+    letter-spacing: normal;
+    word-spacing: normal;
+    line-height: normal;
+    text-transform: none;
+    text-indent: 0px;
+    text-shadow: none;
+    display: inline-block;
+    text-align: start;
+    appearance: auto;
+    -webkit-rtl-ordering: logical;
+    resize: auto;
+    cursor: text;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    background-color: field;
+    column-count: initial !important;
+    margin: 0em;
+    border-width: 1px;
+    border-style: solid;
+    border-color: -internal-light-dark(rgb(118, 118, 118), rgb(133, 133, 133));
+    border-image: initial;
+    overflow: auto;
+    border: 1px solid #656565;
+    border-radius: 4px;
+    padding: 6px;
+}
+
+.textwrapper {
+    border: 1px solid #999999;
+    margin: 5px 0;
+    padding: 0px;
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
+
+.openssl-text {
+    color: #1c87c9 !important;
+}
+
+.not-your-cards {
+    color: red;
+    font-size: 15px;
+    font-weight: normal;
+    font-family: sans-serif;
+    cursor: pointer;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.pb-4,
+.py-4 {
+    padding-bottom: 1.5rem !important;
+}
+
+.mt-4,
+.my-4 {
+    margin-top: 1.5rem !important;
+}
+
+.col-12 {
+    -webkit-box-flex: 0;
+    -ms-flex: 0 0 100%;
+    flex: 0 0 100%;
+    max-width: 100%;
+}
+
+.footer-wrapper {
+    color: #fff;
+    background-color: #fff;
+    padding-top: 5px;
+}
+
+@media (min-width: 992px) {
+    .p-lg-0 {
+        padding: 0 !important;
+    }
+}
+
+.container,
+.container-fluid,
+.container-lg,
+.container-md,
+.container-sm,
+.container-xl {
+    width: 100%;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.pt-4,
+.py-4 {
+    padding-top: 1.5rem !important;
+}
+
+.mb-3,
+.my-3 {
+    margin-bottom: 1rem !important;
+}
+
+.m-0 {
+    margin: 0 !important;
+}
+
+.row {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+}
+
+.col-sm-12 {
+    -webkit-box-flex: 0;
+    -ms-flex: 0 0 100%;
+    flex: 0 0 100%;
+    max-width: 100%;
+}
+
+.col,
+.col-1,
+.col-2,
+.col-3,
+.col-4,
+.col-5,
+.col-6,
+.col-7,
+.col-8,
+.col-9,
+.col-10,
+.col-11,
+.col-12,
+.col-auto,
+.col-lg,
+.col-lg-1,
+.col-lg-2,
+.col-lg-3,
+.col-lg-4,
+.col-lg-5,
+.col-lg-6,
+.col-lg-7,
+.col-lg-8,
+.col-lg-9,
+.col-lg-10,
+.col-lg-11,
+.col-lg-12,
+.col-lg-auto,
+.col-md,
+.col-md-1,
+.col-md-2,
+.col-md-3,
+.col-md-4,
+.col-md-5,
+.col-md-6,
+.col-md-7,
+.col-md-8,
+.col-md-9,
+.col-md-10,
+.col-md-11,
+.col-md-12,
+.col-md-auto,
+.col-sm,
+.col-sm-1,
+.col-sm-2,
+.col-sm-3,
+.col-sm-4,
+.col-sm-5,
+.col-sm-6,
+.col-sm-7,
+.col-sm-8,
+.col-sm-9,
+.col-sm-10,
+.col-sm-11,
+.col-sm-12,
+.col-sm-auto,
+.col-xl,
+.col-xl-1,
+.col-xl-2,
+.col-xl-3,
+.col-xl-4,
+.col-xl-5,
+.col-xl-6,
+.col-xl-7,
+.col-xl-8,
+.col-xl-9,
+.col-xl-10,
+.col-xl-11,
+.col-xl-12,
+.col-xl-auto {
+    position: relative;
+    width: 100%;
+}
+
+.mb-4,
+.my-4 {
+    margin-bottom: 1.5rem !important;
+}
+
+.border-white {
+    border-color: #fff !important;
+}
+
+.border-top {
+    border-top: 1px solid #dee2e6 !important;
+}
+
+.col-lg-3 {
+    -webkit-box-flex: 0;
+    -ms-flex: 0 0 25%;
+    flex: 0 0 20%;
+    max-width: 20%;
+}
+
+@media (min-width: 768px) {
+    .col-md-3 {
+        -webkit-box-flex: 0;
+        -ms-flex: 0 0 25%;
+        flex: 0 0 25%;
+        max-width: 25%;
+    }
+}
+
+@media (min-width: 576px) {
+    .col-sm-12 {
+        -webkit-box-flex: 0;
+        -ms-flex: 0 0 100%;
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+.justify-content-center {
+    -webkit-box-pack: center !important;
+    -ms-flex-pack: center !important;
+    justify-content: center !important;
+}
+
+.d-inline {
+    display: inline !important;
+}
+
+.discover,
+.mastercard,
+.src {
+    width: 43px;
+    height: 20px;
+}
+
+.visa {
+    width: 38px;
+    height: 15px;
+}
+
+.amex {
+    width: 25px;
+    height: 20px;
+}
+
+.mr-1,
+.mx-1 {
+    margin-right: 0.25rem !important;
+}
+
+.mr-2,
+.mx-2 {
+    margin-right: 0.5rem !important;
+}
+
+img,
+svg {
+    vertical-align: middle;
+}
+
+img {
+    border-style: none;
+}
+
+.text-white {
+    color: #fff !important;
+}
+
+.cardart {
+    position: relative;
+    text-align: center;
+    color: white;
+}
+
+.cardart-bottom-left {
+    position: absolute;
+    bottom: 100px;
+    left: 16px;
+    text-align: left;
+}
+
+.cardart-top-left {
+    position: absolute;
+    top: 8px;
+    left: 16px;
+}
+
+.cardart-top-right {
+    position: absolute;
+    top: 8px;
+    right: 16px;
+}
+
+.cardart-bottom-right {
+    position: absolute;
+    bottom: 8px;
+    right: 16px;
+}
+
+.cardart-centered {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+div.editable {
+    width: 750px;
+    height: 500px;
+    border: 2px solid #000;
+    padding: 5px;
+    margin: -5px;
+    background-color: white;
+    word-wrap: break-word;
+    font-family: "Times New Roman", Times, serif;
+    overflow: scroll;
+    overflow-x: auto;
+}
+
+.ccFormatMonitor {
+    width: 210px;
+}
+
+[data-tip] {
+    position: relative;
+}
+
+[data-tip]:before {
+    content: "";
+    /* hides the tooltip when not hovered */
+    display: none;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid #1a1a1a;
+    position: absolute;
+    top: 30px;
+    left: 35px;
+    z-index: 8;
+    font-size: 0;
+    line-height: 0;
+    width: 0;
+    height: 0;
+}
+
+[data-tip]:after {
+    display: none;
+    content: attr(data-tip);
+    position: absolute;
+    top: 35px;
+    left: 0px;
+    padding: 5px 8px;
+    background: #1a1a1a;
+    color: #fff;
+    z-index: 9;
+    font-size: 0.75em;
+    height: 18px;
+    line-height: 18px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    white-space: nowrap;
+    word-wrap: normal;
+}
+
+[data-tip]:hover:before,
+[data-tip]:hover:after {
+    display: block;
+}
+
+.parent {
+    text-align: center;
+}
+
+.child {
+    display: inline-block;
+    padding: 1rem 1rem;
+    vertical-align: top;
+    text-align: left;
+}
+
+.collapsible {
+    background-color: #777;
+    color: white;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+}
+
+.active,
+.collapsible:hover {
+    background-color: #555;
+}
+
+.content {
+    padding: 0 1px;
+    display: none;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+}
+
+.collapsible:after {
+    content: "\2212";
+    color: white;
+    font-weight: bold;
+    float: right;
+    margin-left: 5px;
+}
+
+.active:after {
+    content: "\002B";
+}
+
+.Configuration-table {
+    border-left: 1px black solid;
+    border-right: 1px black solid;
+    border-bottom: 1px black solid;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.Configuration-table td {
+    vertical-align: top;
+}
+
+.label-col {
+    width: 38%;
+}
+
+.sub-table {
+    width: 100%;
+    border: 0;
+}
+
+.textarea-col {
+    width: 50%;
+}
+
+.src-main-table-td {
+    width: 35%;
+    vertical-align: top;
+}
+
+.src-sub-table {
+    width: 100%;
+    border: 0px;
+    color: none;
+}
+
+.src-sub-table-td {
+    width: 38%;
+}
+
+.glow-on-hover {
+    width: 250px;
+    height: 50px;
+    border: none;
+    outline: none;
+    color: #fff;
+    background: #111;
+    cursor: pointer;
+    position: relative;
+    z-index: 0;
+    border-radius: 10px;
+    font-family: Courier New, monospace;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    border: 0;
+}
+
+.toggle-table {
+    width: 100%;
+    border: 0px;
+}
+
+.table-width-fifty-percent {
+    width: 50%;
+}
+
+.table-width-hundred-percent {
+    width: 100%;
+}
+
+.open-tab-table {
+    width: 50%;
+    vertical-align: top;
+}
+
+.display-hide {
+    display: none;
+}
+
+.hide-btn {
+    all: unset !important;
+    content: pointer !important;
+    cursor: pointer !important;
+}
+
+.glow-on-hover:before {
+    content: "";
+    background: linear-gradient(45deg,
+            #ff0000,
+            #ff7300,
+            #fffb00,
+            #48ff00,
+            #00ffd5,
+            #002bff,
+            #7a00ff,
+            #ff00c8,
+            #ff0000);
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    background-size: 400%;
+    z-index: -1;
+    filter: blur(5px);
+    width: calc(100% + 4px);
+    height: calc(100% + 4px);
+    animation: glowing 20s linear infinite;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    border-radius: 10px;
+}
+
+.glow-on-hover:active {
+    color: #000;
+}
+
+.glow-on-hover:active:after {
+    background: transparent;
+}
+
+.glow-on-hover:hover:before {
+    opacity: 1;
+}
+
+.glow-on-hover:after {
+    z-index: -1;
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #111;
+    left: 0;
+    top: 0;
+    border-radius: 10px;
+}
+
+@keyframes glowing {
+    0% {
+        background-position: 0 0;
+    }
+
+    50% {
+        background-position: 400% 0;
+    }
+
+    100% {
+        background-position: 0 0;
+    }
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+}
+
+.toggle {
+    cursor: pointer;
+    display: inline-block;
+    margin: 4px;
+}
+
+.toggle-switch {
+    display: inline-block;
+    background: #ccc;
+    border-radius: 16px;
+    width: 58px;
+    height: 32px;
+    position: relative;
+    vertical-align: middle;
+    transition: background 0.25s;
+}
+
+.toggle-switch:before,
+.toggle-switch:after {
+    content: "";
+}
+
+.toggle-switch:before {
+    display: block;
+    background: linear-gradient(to bottom, #fff 0%, #eee 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    transition: left 0.25s;
+}
+
+.toggle:hover .toggle-switch:before {
+    background: linear-gradient(to bottom, #fff 0%, #fff 100%);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+
+.toggle-checkbox:checked+.toggle-switch {
+    background: #56c080;
+}
+
+.toggle-checkbox:checked+.toggle-switch:before {
+    left: 30px;
+}
+
+.toggle-checkbox {
+    position: absolute;
+    visibility: hidden;
+}
+
+.toggle-label {
+    margin-left: 5px;
+    position: relative;
+    top: 2px;
+}
+
+.my-checkbox {
+    transform: scale(1.5);
+    margin-right: 5px;
+}
+
+.collapsibleUI {
+    background-color: #777;
+    color: white;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+}
+
+.active,
+.collapsibleUI:hover {
+    background-color: #555;
+}
+
+.contentUI {
+    padding: 0 18px;
+    display: none;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+}
+
+.collapsibleUI:after {
+    content: "\2212";
+    color: white;
+    font-weight: bold;
+    float: right;
+    margin-left: 5px;
+}
+
+.Configuration-tableUI {
+    border-left: 1px black solid;
+    border-right: 1px black solid;
+    border-bottom: 1px black solid;
+}
+
+/* Style the tab */
+.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+    font-family: Courier New, monospace;
+}
+
+.tab1 {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+    font-family: Courier New, monospace;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+}
+
+.tab1 button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+    background-color: #ddd;
+}
+
+.tab1 button:hover {
+    background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.activetab {
+    background-color: #ccc;
+}
+
+.tab1 button.activetab {
+    background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+}
+
+.tabcontent1 {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+}
+
+input {
+    border: 1px solid #656565;
+    border-radius: 4px;
+    padding: 6px;
+    font-family: Courier New, monospace;
+}
+
+a {
+    font-size: 1.125rem;
+    color: #e87600 !important;
+}
+
+/*tooltip Box*/
+.con-tooltip {
+    position: relative;
+    background: #fff;
+
+    border-radius: 9px;
+    padding: 0 20px;
+    margin: 10px;
+
+    display: inline-block;
+
+    transition: all 0.3s ease-in-out;
+    cursor: default;
+}
+
+/*tooltip */
+.tooltip {
+    visibility: hidden;
+    z-index: 1;
+    opacity: 0.4;
+
+    width: 100%;
+    padding: 0px 20px;
+
+    background: #333;
+    color: #e086d3;
+
+    position: absolute;
+    top: -140%;
+    left: -25%;
+
+    border-radius: 9px;
+    font: 16px;
+
+    transform: translateY(9px);
+    transition: all 0.3s ease-in-out;
+
+    box-shadow: 0 0 3px rgba(56, 54, 54, 0.86);
+}
+
+/* tooltip  after*/
+.tooltip::after {
+    content: " ";
+    width: 0;
+    height: 0;
+
+    border-style: solid;
+    border-width: 12px 12.5px 0 12.5px;
+    border-color: #333 transparent transparent transparent;
+
+    position: absolute;
+    left: 40%;
+}
+
+.con-tooltip:hover .tooltip {
+    visibility: visible;
+    transform: translateY(-10px);
+    opacity: 1;
+    transition: 0.3s linear;
+    animation: odsoky 1s ease-in-out infinite alternate;
+}
+
+@keyframes odsoky {
+    0% {
+        transform: translateY(6px);
+    }
+
+    100% {
+        transform: translateY(1px);
+    }
+}
+
+/*hover ToolTip*/
+.left:hover {
+    transform: translateX(-6px);
+}
+
+.top:hover {
+    transform: translateY(-6px);
+}
+
+.bottom:hover {
+    transform: translateY(6px);
+}
+
+.right:hover {
+    transform: translateX(6px);
+}
+
+/*left*/
+
+.left .tooltip {
+    top: -20%;
+    left: -170%;
+}
+
+.left .tooltip::after {
+    top: 40%;
+    left: 90%;
+    transform: rotate(-90deg);
+}
+
+/*bottom*/
+
+.bottom .tooltip {
+    top: 115%;
+    left: -20%;
+}
+
+.bottom .tooltip::after {
+    top: -17%;
+    left: 40%;
+    transform: rotate(180deg);
+}
+
+/*right*/
+
+.right .tooltip {
+    top: -20%;
+    left: 115%;
+}
+
+.right .tooltip::after {
+    top: 40%;
+    left: -12%;
+    transform: rotate(90deg);
+}
+
+.hide {
+    display: none;
+}
+
+.full {
+    height: 100%;
+    width: 100%;
+}
+
+#cards {
+    border-radius: 4px;
+    padding: 6px;
+}
+
+.jconfirm-holder {
+    border-radius: 15px;
+}

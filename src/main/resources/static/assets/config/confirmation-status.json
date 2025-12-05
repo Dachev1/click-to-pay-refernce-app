@@ -1,0 +1,14 @@
+[
+    {
+        "name": "Success",
+        "value": "01"
+    },
+    {
+        "name": "Failure",
+        "value": "02"
+    },
+    {
+        "name": "Other",
+        "value": "03"
+    }
+]

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>MCS Click To Pay - Merchant Registration API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8" />
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/fontawesome/css/all.min.css" />
+
+    <script src="/assets/js/jquery.min.js"></script>
+    <script src="/assets/js/jquery.validate.min.js"></script>
+
+    <script src="/assets/js/environment.js"></script>
+
+    <script src="/assets/js/get-dpa-status.js"></script>
+     <script src="/assets/js/common.js"></script>
+
+
+    <!-- Font Awesome CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link rel="icon" type="image/svg" href="/assets/images/favicon.svg">
+</head>
+
+<body>
+    <div class="container-fluid p-0">
+        <!-- Main Header Start Here -->
+       <nav class="mc-oba-header">
+            <div class="mc-oba-header-left">
+                <img src="/assets/images/mc_symbol_opt_73_3x.png" alt="Mastercard" class="mc-oba-logo" />
+                <a href="https://developer.mastercard.com/mastercard-checkout-solutions/documentation/use-cases/click-to-pay/"
+                    class="mc-oba-developers-link" target="_blank">
+                    developers<i class="fa-solid fa-arrow-up-right-from-square"></i>
+
+                </a>
+            </div>
+            <div class="mc-oba-header-center">
+                <span class="mc-oba-header-app">REFERENCE APP</span>
+                <span class="mc-oba-header-title">MCS - Click to Pay</span>
+            </div>
+            <div class="mc-oba-header-right">
+                <a href="https://developer.mastercard.com/mastercard-checkout-solutions/documentation/api-reference/apis/"
+                    class="mc-oba-github-link" target="_blank">
+                    API Reference
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Header End Here -->
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mt-0 mb-0 api-form-box">
+            <!-- API Name Header Start Here -->
+            <div class="row mb-3 api-name-border pb-3">
+                <div class="col-xl-1 col-lg-1 col-md-1 col-sm-1 col-2 d-flex align-items-center">
+                    <a href="/" class="text-decoration-none">
+                        <img class="back-logo" src="/assets/images/back_icon@2x.png" alt="Back Logo" />
+                    </a>
+                </div>
+                <div
+                    class="col-xl-11 col-lg-11 col-md-11 col-sm-11 col-10 d-flex align-items-center justify-content-center p-0">
+                    <span class="api-name-label"> MCS Click To Pay - Merchant Registration API </span>
+                </div>
+            </div>
+            <!-- API Name Header End Here -->
+
+            <!-- Sub Navigation Start Here -->
+            <div class="row mt-3">
+                <div
+                    class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 d-flex align-items-center justify-content-center api-menu-sub-label text-center padding-top-none">
+                    <a class="api-names-box" href="dpa-bulk-add-update-delete-api-integration.html?action=ADD">
+                        <label class="api-label" for="add-dpa">ASYNCHRONOUS - DPA BULK ADD/UPDATE/DELETE</label>
+                    </a>
+                </div>
+              
+                <div
+                    class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 d-flex align-items-center justify-content-center api-menu-sub-label text-center padding-top-none">
+                    <a class="api-names-box active" href="get-status-api-integration.html">
+                        <label class="api-label" for="delete-dpa">GET STATUS OF DPA</label>
+                    </a>
+                </div>
+            </div>
+            <!-- Sub Navigation Ends Here -->
+
+           
+            <div class="container-fluid p-0 pt-4 pb-0">
+                <h2 class="mc-page-title">Get Status of DPA</h2>
+                <div class="mc-page-subtitle">Get Status of DPA Request</div>
+
+                <span class="mb-3 styled-line"></span>
+            </div>
+            <div class="content">
+                <form id="get-status-form">
+                    <input type="hidden" id="actionMode" value="ADD" />
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="correlationId">Correlation Id:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:<br>Header</b><br>Required. A unique identifier that correlates a series of two or more requests to a single session of activity. Mastercard Checkout Solutions (MCS) will return a new srcCorrelationId in each response by default, but Integrators may choose to populate previously used srcCorrelationIds in subsequent requests to correlate their activity under a single ID. This can be done by providing a Mastercard generated srcCorrelationId in the request, or by generating your own ID in the same format. SrcCorrelationId is used for tracking and troubleshooting purposes within Mastercard's ecosystem.<br><br>Required: True<br><br>Example: 0000016e0364631b-e4cefc<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="correlationId" name="correlationId" required class="form-control"
+                                value="0000016e0364631b-e4cefc">
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="srcClientId">SRC Client Id:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:<br>Path variable</b><br>Required. A unique identifier assigned by Mastercard during onboarding which signifies the responsible party Integrating to Mastercard Checkout Solutions (MCS).<br><br>Required: True<br><br>Example: 5e0d4b84-189d-4c86-822d-590602f62062<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="srcClientId" name="srcClientId" required class="form-control"
+                                value="">
+                        </div>
+                    </div>
+
+                    <div class="row optional-dpa-section">
+                        <div class="col-md-6 form-group">
+                            <label for="batchId">Batch Id:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:<br>Path variable</b><br>Required. A unique identifier associated with the submitted Digital Payment Application (DPA) batch. The Batch ID can be used to retrieve the status of the batch by calling GET DPA status endpoint.<br><br>Required: True<br><br>Example: 1c9d3e43-f232-44a1-9552-7da22aaf5590<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="batchId" name="batchId" required class="form-control"
+                                value="03af8afb-6e44-463d-92d7-baababb28c95">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn submit-btn">Submit</button>
+                    <span class="mb-3 mt-5 styled-line"></span>
+                </form>
+
+                <div class="api-object-card mt-4" style="display: none;">
+                    <div class="api-object-header">
+                        <span class="api-object-icon"><i class="fa-solid fa-arrow-right"></i></span>
+                        Request Headers
+                        <button type="button" class="copy-json-btn" data-target="#requestHeadersContent" title="Copy">
+                            <i class="fa fa-copy"></i>
+                        </button>
+                    </div>
+                    <pre class="api-json-block" id="requestHeadersContent"></pre>
+                </div>
+
+                <div class="api-object-card mt-4">
+                    <div class="api-object-header">
+                        <span class="api-object-icon"><i class="fa-solid fa-code"></i></span>
+                        Request Object
+                        <button type="button" class="copy-json-btn" data-target="#requestBodyContent" title="Copy">
+                            <i class="fa fa-copy"></i>
+                        </button>
+                    </div>
+                    <pre class="api-json-block" id="requestBodyContent"></pre>
+                </div>
+
+                <div class="api-object-card mt-4">
+                    <div class="api-object-header">
+                        <span class="api-object-icon"><i class="fa-solid fa-code-branch"></i></span>
+                        Response Object
+                        <button type="button" class="copy-json-btn" data-target="#responseContent" title="Copy">
+                            <i class="fa fa-copy"></i>
+                        </button>
+                    </div>
+                    <pre class="api-json-block" id="responseContent"></pre>
+                </div>
+
+                <div class="api-object-card mt-4">
+                    <div class="api-object-header">
+                        <span class="api-object-icon"><i class="fa-solid fa-server"></i></span>
+                        Response Headers
+                        <button type="button" class="copy-json-btn" data-target="#mastercardResponseHeadersContent"
+                            title="Copy">
+                            <i class="fa fa-copy"></i>
+                        </button>
+                    </div>
+                    <pre class="api-json-block" id="mastercardResponseHeadersContent"></pre>
+                </div>
+
+            </div>
+        </div>
+        <div id="spinner" class=""></div>
+        <!-- Bootstrap JS and dependencies -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+        <script>
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip();
+            });
+        </script>
+</body>
+
+</html>

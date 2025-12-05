@@ -1,0 +1,884 @@
+openapi: 3.0.0
+info:
+  description: 'Registration APIs for Mastercard Checkout Solutions to submit new DPA data or check status of an existing uploaded batch'
+  version: 1.0.0
+  title: Mastercard Checkout Solutions Merchant Registration API
+  termsOfService: https://developer.mastercard.com/terms-of-use
+  contact:
+    email: apisupport@mastercard.com
+    url: https://developer.mastercard.com/support
+    name: API Support
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+tags:
+  - name: Merchant Registration
+    description: Mastercard Checkout Solutions Merchant Registration API
+servers:
+  - url: https://sandbox.api.mastercard.com/src/onboarding
+    description: Sandbox server
+  - url: https://api.mastercard.com/src/onboarding
+    description: Production server
+paths:
+  /srci/{src-client-id}/dpas/batch:
+    post:
+      summary: Asynchronous - DPA bulk Add/Update/Delete
+      description: |
+         This is a composite API and performs the following functions in a single call.
+
+          * ADD -- Add the DPA record.
+          * UPDATE -- Update the DPA record.
+          * DELETE --Delete the DPA record
+
+          Additionally, this request can be used to generate serviceIds in Commerce Platform use cases.
+
+          A Digital Payment Application (DPA) is a website, web or mobile application operated by a Merchant, marketplace, or other service provider where a consumer can purchase goods or services.
+
+          A ServiceId is a unique identifier assigned by Mastercard for which tokens are created uniquely for the entity onboarded. A serviceId can have multiple associated DPAs.
+
+          This request must contain the following values, for detail please refer to the Body Model description::
+
+            * items
+            * action
+            * programType
+
+          The contents of the DPA items will vary based on the operation requested.
+
+          Note:
+          * For UPDATE operations, only DPA data are updated. Once registered, a DPA cannot be associated with a new serviceId or programType. A new DPA will need to be ADDed for each programType/serviceId.
+          * It is recommended to provide **either** ADD **or** UPDATE across different items within the same batch of DPA Registration API
+      operationId: bulkAddUpdateDpa
+      parameters:
+        - $ref: '#/components/parameters/srcCorrelationId'
+        - $ref: '#/components/parameters/srcClientId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DpaAddUpdateRequest'
+            examples:
+              EXAMPLE - ADD:
+                value:
+                  items:
+                    -
+                      action: "ADD"
+                      programType: "SRC"
+                      programName: "myShop*pay"
+                      dpas:
+                        -
+                          srcDpaId: "src_dpa_56068"
+                          dpaData:
+                            dpaAddress:
+                              name: "Ecom Online Store"
+                              line1: "100 Avenue Lane Street"
+                              line2: "Address line 2"
+                              line3: "Address line 3"
+                              city: "Metropolis"
+                              state: "MH"
+                              countryCode: "US"
+                              zip: "41321"
+                            dpaName: "Ecom Holdings Online Inc"
+                            dpaLogoUri: "https://example.com/ecom-online-ltd/images/ecom-logo.png"
+                            dpaUri: "https://example.com/ecom-online-ltd/basket.html"
+                            dpaPresentationName: "FieldTestDpa01_update12"
+                          merchantCategoryCodes:
+                            -
+                              "0020"
+                          threeDSDefaultdata:
+                            defaultAcquirerBin: "A123456"
+                            defaultAcquirerMerchantId: "M123456"
+                            defaultMerchantCountryCode: "US"
+                          acquirerData:
+                            -
+                              acquirerIca: "12345"
+                              acquirerBin: "112233"
+                              acquirerMerchantId: "MC1234567891234"
+                            -
+                              acquirerIca: "23432"
+                              acquirerBin: "876543"
+                              acquirerMerchantId: "X32123564A4"
+
+
+              EXAMPLE - UPDATE:
+                value:
+                  items:
+                    -
+                      action: "UPDATE"
+                      programType: "SRC"
+                      serviceId: "SRC"
+                      programName: "myShop*pay"
+                      dpas:
+                        -
+                          srcDpaId: "src_dpa_56068"
+                          dpaData:
+                            dpaAddress:
+                              name: "Ecom Online Store"
+                              line1: "100 Avenue Lane Street"
+                              line2: "Address line 2"
+                              line3: "Address line 3"
+                              city: "Metropolis"
+                              state: "MH"
+                              countryCode: "US"
+                              zip: "41321"
+                            dpaName: "Ecom Holdings Online Inc"
+                            dpaLogoUri: "https://example.com/ecom-online-ltd/images/ecom-logo.png"
+                            dpaUri: "https://example.com/ecom-online-ltd/basket.html"
+                            dpaPresentationName: "FieldTestDpa01_update12"
+                          merchantCategoryCodes:
+                            -
+                              "0120"
+                          threeDSDefaultdata:
+                            defaultAcquirerBin: "A123456"
+                            defaultAcquirerMerchantId: "M123456"
+                            defaultMerchantCountryCode: "US"
+                          acquirerData:
+                            -
+                              acquirerIca: "12345"
+                              acquirerBin: "112233"
+                              acquirerMerchantId: "MC1234567891234"
+
+
+              EXAMPLE - DELETE:
+                value:
+                  items:
+                    -
+                      action: "DELETE"
+                      programType: "SRC"
+
+                      dpas:
+                        -
+                          srcDpaId: "src_dpa_56068"
+
+        description: DPA asynchronous/bulk Registration Request
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DpaAddUpdateResponse'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - Merchant Registration
+  /srci/{src-client-id}/dpas/batch/status/{batch-id}:
+    get:
+      summary: Get status of the DPA Add/Update async (batch) job by Batch ID.
+      description: The GET Status API allows the SRC Initiator to retrieve the status of a DPA Registration request submitted earlier.
+      operationId: getDpaBatchStatus
+      parameters:
+        - $ref: '#/components/parameters/srcCorrelationId'
+        - $ref: '#/components/parameters/srcClientId'
+        - $ref: '#/components/parameters/batchId'
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DpaBatchStatus'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - Merchant Registration
+
+
+components:
+  responses:
+    BadRequest:
+      description: "Bad request, see error object for details"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            INVALID_ARGUMENT:
+              $ref: '#/components/examples/InvalidArgument'
+    Forbidden:
+      description: "Forbidden, see error object for details, e.g. client identity (origin) not validated"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            FORBIDDEN:
+              $ref: '#/components/examples/Forbidden'
+
+    InternalServerError:
+      description: |
+        Internal server error, see error object for details
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            SERVER_ERROR:
+              $ref: '#/components/examples/ServerError'
+
+    NotFound:
+      description: |
+        Not found, see error object for details.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            NOT_FOUND:
+              $ref: '#/components/examples/NotFound'
+    Unauthorized:
+      description: "Unauthorized, see error object for details, e.g. authorization token validation failure"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            UNAUTHORIZED:
+              $ref: '#/components/examples/UnAuthorized'
+
+  examples:
+    InvalidArgument:
+      value:
+        error:
+          status: 400
+          reason: "INVALID_VALUE"
+          message: "Invalid Srci-Client Id"
+          errordetail:
+            - reason: "INVALID_VALUE"
+              sourceType: "DOWNSTREAM"
+              message: "Invalid Srci-Client Id"
+              source: "Application"
+    NotFound:
+      value:
+        error:
+          status: 404
+          reason: "NOT_FOUND"
+          message: "No details found for given SrcClientId: c68ad33f-a333-46a2-a1bb-13abb323d3b8, batchId: ad1133f-d853-46a2-a1bb-13abb323d3b8"
+          errordetail:
+            - reason: "INVALID_VALUE"
+              sourceType: "BODY"
+              message: "No details found for given SrcClientId: c68ad33f-a333-46a2-a1bb-13abb323d3b8, batchId: ad1133f-d853-46a2-a1bb-13abb323d3b8"
+              source: "Application"
+    UnAuthorized:
+      value:
+        error:
+          status: 401
+          reason: "DECLINED"
+          message: "Unauthorized - Access Not Granted"
+          errordetail:
+            - reason: "DECLINED"
+              sourceType: "Gateway"
+              message: "Unauthorized - Access Not Granted"
+              source: "Gateway"
+    ServerError:
+      value:
+        error:
+          status: 500
+          reason: "INVALID_STATE"
+          message: "Internal server error. Typically a server bug. The client should report this error to the Mastercard support team"
+    Forbidden:
+      value:
+        error:
+          status: 403
+          reason: "AUTHENTICATION_FAILED"
+          message:
+          errordetail:
+            - reason: "AUTHENTICATION_FAILED"
+              sourceType: "Gateway"
+              message: "OAuth Signature parameter failed verification."
+              source: "Gateway"
+
+  parameters:
+    batchId:
+      in: path
+      name: batch-id
+      description: A unique identifier associated with the submitted Digital Payment Application (DPA) batch. The Batch ID can be used to retrieve the status of the batch by calling GET DPA status endpoint.
+      example: "1c9d3e43-f232-44a1-9552-7da22aaf5590"
+      required: true
+      schema:
+        type: string
+    srcClientId:
+      in: path
+      name: src-client-id
+      description: A unique identifier assigned by Mastercard during onboarding which signifies the responsible party Integrating to Mastercard Checkout Solutions (MCS).
+      example: "5e0d4b84-189d-4c86-822d-590602f62062"
+      required: true
+      schema:
+        type: string
+    srcCorrelationId:
+      in: header
+      name: correlation-id
+      description: A unique identifier that correlates a series of two or more requests to a single session of activity. Mastercard Checkout Solutions (MCS) will return a new srcCorrelationId in each response by default, but Integrators may choose to populate previously used srcCorrelationIds in subsequent requests to correlate their activity under a single ID. This can be done by providing a Mastercard generated srcCorrelationId in the request, or by generating your own ID in the same format. SrcCorrelationId is used for tracking and troubleshooting purposes within Mastercard's ecosystem.
+      example: "0000016e0364631b-e4cefc"
+      required: true
+      schema:
+        type: string
+  schemas:
+    AcquirerData:
+      type: object
+      description: |
+
+        Object for details about the acquiring institution (for example, merchant bank) or its agent. This includes acquirerIca, acquirerMerchantId and acquirerBin. This object may be used to improve transaction acceptance rates.
+      required:
+        - acquirerIca
+        - acquirerMerchantId
+      properties:
+        acquirerIca:
+          type: string
+          description: An Acquirer Interbank Card Association (ICA) value is an identifier assigned to the Acquirer by Mastercard.
+          example: "12345"
+        acquirerBin:
+          type: string
+          description: |
+            Each Acquirer Interbank Card Association (ICA) identifier may be assigned one or more BINs by Mastercard.
+
+            Note: It is important to use the correct Acquirer ICA associated with the Acquirer BIN.
+          example: "112233"
+        acquirerMerchantId:
+          type: string
+          description: A Merchant Identifier (MID) is a unique code assigned to the Merchant by the Acquirer once the Merchant has successfully opened an account. A MID identifies the Merchant to the Acquirer.
+          example: "MC1234567891234"
+    AddUpdateItems:
+      type: object
+      required:
+        - action
+        - programType
+      properties:
+        action:
+          example: "UPDATE"
+          description: |
+            The action to be performed on the Digital Payment Application (DPA). The selected action will be applied to all DPAs provided in the items list.
+
+            ADD - Add DPA
+
+            UPDATE - Update DPA
+
+            DELETE - Delete DPA
+
+            Note:
+            * A limited number of DPA fields can be changed using the __UPDATE__ action. These are `dpaPresentationName`, `programName`, `dpaLogoUri`, `merchantCategoryCode` and `threeDSDefaultData`. Please refer to the example for a minimal use case.
+            * All DPA data from the original request (including non-updatable fields) will also need to be provided unchanged in the __PUT__ request for the operation to process successfully.
+
+          enum:
+            - ADD
+            - UPDATE
+            - DELETE
+
+          type: string
+        customerId:
+          maxLength: 60
+          description: |
+            Conditional: The Customer Identifier (CID) must be passed when the Integrator is acting On-Behalf-Of (OBO) a client, registering through the Mastercard Connect (MC Connect) portal, or participating in the Secure Card on File (SCOF) program.
+
+            This field should be populated with the CID of the Integrator's client (e.g., a Payment Service Provider (PSP) would pass the CID of the client they are integrating, i.e. DASP model).
+          example: "100039"
+          type: string
+        programType:
+          example: "SECURE_COF_MERCHANT"
+          description: |
+            The Mastercard program that the Integrator would like to add their client(s) to. The Integrator must be enrolled in the program prior to enrolling their client(s). Integrators may view their active programs in the Mastercard Connect (MC Connect) portal.
+
+            `SECURE_COF_MERCHANT` -  Integrating Merchant managing network tokenization. Tokens generated are unique for each merchant.
+
+            `SECURE_COF_MERCHANT_OBO` - Integrating Payment Service Provider (PSP) managing network tokenization for their Merchant(s). Tokens generated are unique for each merchant.
+
+            `SECURE_COF_COMMERCE_PLATFORM` - Integrating Commerce Platform managing network tokenization. Tokens are generated unique for each Commerce Platform (tokens will be shared among their marketplace).
+
+            `SECURE_COF_COMMERCE_PLATFORM_OBO` - Integrating PSPs managing network tokenization for their Commerce Platform(s). Tokens are generated unique for each Commerce Platform (tokens will be shared among their marketplace).
+
+            `SECURE_COF_MERCHANT_OBO_SHARED` - Integrating PSPs managing network tokenization for their sub-Merchants. Tokens generated are unique for each Merchant Group.
+
+            `SRC` - Integrating Merchants and PSPs participating in or offering the Click to Pay (C2P) program.
+
+            `GUEST_CHECKOUT_TOKENIZATION` - A checkout solution that uses an alternative identifier to Account PANs, generated by the issuing network for guest checkout tokenization.
+
+            Note: Other programTypes (e.g., AUTOFILL, SQR_DEVICE etc.) may be available to select regions. Please contact your Mastercard representative for more details.
+          enum:
+            - SRC
+            - SECURE_COF_MERCHANT_OBO
+            - SECURE_COF_MERCHANT
+            - SECURE_COF_MERCHANT_OBO_SHARED
+            - SECURE_COF_COMMERCE_PLATFORM
+            - SECURE_COF_COMMERCE_PLATFORM_OBO
+            - SQR_DEVICE
+            - AUTOFILL
+            - GUEST_CHECKOUT_TOKENIZATION
+          type: string
+        trid:
+          description: The Token Requestor Identifier (TRID) should be passed by MDES for Merchants (M4M) Integrators who would like to onboard their M4M TRIDs to be used on Secure Card on File (SCOF).
+          example: "50132184090"
+          type: string
+        serviceId:
+          description: A unique identifier assigned by Mastercard for which tokens are created uniquely for the entity onboarded.
+          maxLength: 255
+          example: "SECURE_COF_MERCHANT#TESTPROJECT_PROD-PGMNAME#01"
+          type: string
+        category:
+          maxLength: 255
+          description: "Assign a category to the sub-merchant group identified in the request. For example, sub-merchants can be grouped by common attributes such as merchant category code (MCC), volume of transactions, or geography. Required for the SECURE_COF_MERCHANT_OBO_SHARED program type. Examples: \"discount stores\" and \"bakeries\""
+          example: "testCategory"
+          type: string
+        programName:
+          maxLength: 100
+          description: |
+            The Cardholder facing name of the Merchant.
+
+            Conditional: Must be supplied when adding Merchants to all Secure Card On File (SECURE_COF) programs.
+          example: "myShop*pay"
+          type: string
+        dpas:
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Dpas'
+          type: array
+          description: |
+            Dpas
+
+            Object for Integrator to provide a list of Digital Processing Application (DPA) objects. Each DPA object is used to create a corresponding DPA. A minimum of 1 DPA object (to a maximum of 80 DPA objects) must be provided in the request.
+    Address:
+      type: object
+      description: The Digital Payment Application (DPA) business address.
+      properties:
+        name:
+          maxLength: 75
+          description: Contact name for the address.
+          example: "Ecom Online Store"
+          type: string
+        line1:
+          maxLength: 75
+          description: First line of the address.
+          example: "100 Avenue Lane Street"
+          type: string
+        line2:
+          maxLength: 75
+          description: Second line of the address.
+          example: "Address line 2"
+          type: string
+        line3:
+          maxLength: 75
+          description: Third line of the address.
+          example: "Address line 3"
+          type: string
+        city:
+          maxLength: 50
+          description: Address of city
+          example: "Metropolis"
+          type: string
+        state:
+          maxLength: 30
+          description: Address of state
+          example: "MH"
+          type: string
+        countryCode:
+          maxLength: 2
+          description: Address country code. ISO 3166 alpha 2 country code.
+          example: "US"
+          type: string
+        zip:
+          maxLength: 20
+          description: Address zip/postal code.
+          type: string
+          example: "41321"
+    BatchStatusItems:
+      type: object
+      properties:
+        action:
+          example: "ADD"
+          description: |
+            The action to be performed on the Digital Payment Application (DPA). The selected action will be applied to all DPAs provided in the items list.
+
+            __ADD__ - Add DPA
+
+            __UPDATE__ - Update DPA
+
+            __DELETE__ - Delete DPA
+
+            Note: A limited number of DPA fields can be changed using the 'UPDATE' action. These are dpaPresentationName, dpaLogoUri, merchantCategoryCode and threeDSDefaultData. Please refer to the example for a minimal use case.
+          enum:
+            - ADD
+            - UPDATE
+            - DELETE
+
+          type: string
+        serviceId:
+          type: string
+          description: A unique identifier assigned by Mastercard for which tokens are created uniquely for the entity onboarded.
+          example: "SECURE_COF_MERCHANT_OBO#SRC4M-OBO-ALL4PETS#01"
+        trid:
+          description: |
+                       Token Requestors receive a unique identifier, TRID, which represents the consumer-facing entity name to the Issuer 
+                       during the tokenization process. This identifier has a one-to-one relationship with the serviceId.
+                       <br> <br> Note: Reach out to your Mastercard representative to begin receiving trid in API responses.
+          example: "50132184090"
+          type: string
+          minLength: 11
+          maxLength: 11
+        programName:
+          type: string
+          description: |
+            The Cardholder facing name of the Merchant.
+
+            Conditional: Must be supplied when adding Merchants to a Payment Facilitator (PF) program."
+          example: "myShop*pay"
+        status:
+          type: string
+          description: Indicates the status of an individual Digital Payment Application (DPA) item in a batch.
+          example: "SUCCESSFUL"
+          enum:
+            - SUCCESSFUL
+            - FAILED
+        error:
+          $ref: '#/components/schemas/Error'
+        dpaResults:
+          items:
+            $ref: '#/components/schemas/DpaResults'
+          type: array
+
+    DpaAddUpdateRequest:
+      type: object
+      description: |
+        The DpaAddUpdateRequest is used to add, update, or delete DPAs from the Mastercard system. Additionally, the DpaAddUpdateRequest can be used to generate serviceIds in Commerce Platform use cases.
+
+        A Digital Payment Application (DPA) is a website, web or mobile application operated by a Merchant, marketplace, or other service provider where a consumer can purchase goods or services.
+
+        A ServiceId is a unique identifier assigned by Mastercard for which tokens are created uniquely for the entity onboarded. A serviceId can have multiple associated DPAs.
+
+        The DpaAddUpdateRequest request must contain the following values:
+
+         * items
+         * action
+         * programType
+
+         The contents of the DPA items will vary based on the operation requested.
+      required:
+        - items
+      properties:
+        requestId:
+          description: This field allows the Integrator to assign an internal reference to a batch request so that it can be used for internal tracking purposes.
+          example: "48192"
+          type: string
+        items:
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/AddUpdateItems'
+          type: array
+          description: |
+            Items
+
+            Object for Integrator to provide a list of Digital Payment Applications (DPA) to be enrolled in a given program. A minimum of 1 item must be provided in a request.
+    DpaAddUpdateResponse:
+      type: object
+      description: The DpaAddUpdateResponse contains the Batch ID for the submitted Digital Payment Application (DPA) batch. The Batch ID can be used to retrieve the status of the batch.
+      properties:
+        batchId:
+          description: A unique identifier associated with the submitted Digital Payment Application (DPA) batch. The Batch ID can be used to retrieve the status of the batch by calling GET DPA status endpoint.
+          example: "21d03dde-42e4-4ddb-b9f0-96b7cb8bf820"
+          type: string
+    DpaBatchStatus:
+      type: object
+      description: The DpaBatchStatus response contains information related to the status of a submitted Digital Payment Application (DPA) batch.
+      properties:
+        requestId:
+          type: string
+          description: This field allows the Integrator to assign an internal reference to a batch request so that it can be used for internal tracking purposes.
+          example: "48192"
+        batchId:
+          type: string
+          description: A unique identifier associated with the submitted Digital Payment Application (DPA) batch. The Batch ID can be used to retrieve the status of the batch by calling GET DPA status endpoint.
+          example: "f1f225ed-99c6-4a5e-823d-440c09c7e0a6"
+        batchStatus:
+          example: "COMPLETED_SUCCESSFULLY"
+          description: |
+            Describes the outcome of the submitted Digital Payment Application (DPA) batch. Possible outcomes include:
+
+            * COMPLETED_SUCCESSFULLY - Batch was completed successfully and all DPAs included in the batch are ready to transact.
+
+            * COMPLETED_WITH_ERRORS - Batch was completed successfully, but some DPAs included in the batch aren't ready to transact.
+
+            * FAILED -  Batch failed to load.
+
+            * IN_PROGRESS - Batch processing in progress.
+
+            For a full breakdown of all DPA outcomes in a batch, refer to the items.
+          enum:
+            - COMPLETED_SUCCESSFULLY
+            - COMPLETED_WITH_ERRORS
+            - FAILED
+            - IN_PROGRESS
+
+          type: string
+        batchStartTime:
+          type: string
+          description: Start time of batch request
+          example: "2023-02-08 07:10:28.0"
+        batchEndTime:
+          type: string
+          description: End time of batch request
+          example: "2023-02-08 07:10:30.0"
+        errorMessage:
+          type: string
+          description: Provides additional information when batchStatus yields a FAILED status.
+          example: "Merchant not registered under requested program type"
+        items:
+          items:
+            $ref: '#/components/schemas/BatchStatusItems'
+          type: array
+          description: |
+            An array of status objects that describes the outcome of each Digital Payment Application (DPA) item in a batch request.
+
+            Note: DPA item order may differ from original submission."
+      example:
+        requestId: "48192"
+        batchId: "f1f225ed-99c6-4a5e-823d-440c09c7e0a6"
+        batchStatus: "COMPLETED_SUCCESSFULLY"
+        batchStartTime: "2023-02-08 07:10:28.0"
+        batchEndTime: "2023-02-08 07:10:30.0"
+        errorMessage: null
+        items:
+          -
+            action: "ADD"
+            serviceId: "SRC"
+            trid: "50132184090"
+            programName: "Test_Dpa"
+            status: "SUCCESSFUL"
+            error: null
+            dpaResults:
+              -
+                srcDpaId: "58aed7fe-07d9-11ea-8d71-362b9e155667"
+                status: "SUCCESSFUL"
+                dpaName: "TEST_DPA"
+                error: null
+    DpaData:
+      type: object
+      description: |
+        DpaData
+        Object for Integrator to populate Digital Payment Application (DPA) information, including the Merchant name, address, and other relevant data.
+      properties:
+        dpaPresentationName:
+          type: string
+          maxLength: 255
+          description: |
+            The name of the Merchant that the Cardholder will see when checking out with the Digital Payment Application (DPA).
+
+            Conditional: Required for Guest Checkout Tokenization (GCT) and SQR programs.
+          example: "FieldTestDpa01_update12"
+        dpaAddress:
+          $ref: '#/components/schemas/Address'
+        dpaName:
+          type: string
+          maxLength: 60
+          pattern: ^[\\p{L}\\p{N}\\p{M}\\s#\"$&'*+,-.@_:{|}]+$
+          description: Legal name of Merchant (which may differ from dpaPresentationName). Only the special characters defined in the pattern are permitted.
+          example: "Ecom Holdings Online Inc"
+        dpaLogoUri:
+          type: string
+          maxLength: 1024
+          description: URI for the logo displayed to Cardholders during C2P checkout.
+          example: "https://example.com/ecom-online-ltd/images/ecom-logo.png"
+        dpaUri:
+          type: string
+          maxLength: 1024
+          description: URI for your merchant's site for handling all Checkout transactions.
+          example: "http://www.myMerchant.com"
+    DpaResults:
+      type: object
+      description: Object for individual Digital Payment Application (DPA) item status data.
+      properties:
+        srcDpaId:
+          type: string
+          description: |
+            The registered identifier for the Digital Payment Application (DPA) accessing the service.
+
+            Conditional: Required if you are a Merchant directly integrating with Mastercard Checkout Solutions (MCS) APIs, a Payment Service Provider (PSP) integrating On-Behalf-Of (OBO) a Merchant, a Payment Facilitator, or if you are enrolling in the Secure Card on File (SCOF) QR program.
+          example: "58aed7fe-07d9-11ea-8d71-362b9e155667"
+        status:
+          type: string
+          description: |
+            Status of the individual Digital Payment Application (DPA) item. Potential statuses include:
+
+            * SUCCESSFUL - The DPA is eligible to process transactions.
+
+            * FAILED - The DPA is NOT eligible to process transactions. Please see the error object for more details."
+          example: "SUCCESSFUL"
+          enum:
+            - SUCCESSFUL
+            - FAILED
+        dpaName:
+          type: string
+          description: Legal name of Merchant (which may differ from dpaPresentationName).
+          example: "Ecom Holdings Online Inc"
+        error:
+          $ref: '#/components/schemas/Error'
+      example:
+        srcDpaId: "58aed7fe-07d9-11ea-8d71-362b9e155667"
+        status: "SUCCESSFUL"
+        dpaName: "TEST_DPA"
+        error: null
+    Dpas:
+      type: object
+      required:
+        - srcDpaId
+      properties:
+        srcDpaId:
+          type: string
+          description: |
+
+            The registered identifier for the Digital Payment Application (DPA) accessing the service. At least one DPA needs to be registered for each Merchant/Merchant OBO/Sub-Merchant (PF) needed, with additional DPAs being added as required.
+
+            Conditional: Required if you are a Merchant directly integrating with Mastercard Checkout Solutions (MCS) APIs, a Payment Service Provider (PSP) integrating On-Behalf-Of (OBO) a Merchant, a Payment Facilitator, or if you are enrolling in the Secure Card on File (SCOF) QR program.
+          maxLength: 255
+          example: "src_dpa_56068"
+        hasAcquirerRelationship:
+          type: string
+          description: Indicates if the Digital Payment Application (DPA) has an Acquirer relationship. This field may be used to improve acceptance rates.
+          example: "Y"
+          enum:
+            - "Y"
+            - "N"
+        subMerchantId:
+          type: string
+          description: Identifier assigned to a Sub-Merchant by the Payment Facilitator (PF). This field may be used to improve transaction security and acceptance rates.
+          example: "merchant123125"
+        paymentFacilitatorId:
+          type: string
+          description: Payment Facilitator (PF) identifier that may be used to improve transaction security and acceptance rates.
+          example: "pfac123"
+        dpaData:
+          $ref: '#/components/schemas/DpaData'
+        debitTokenRequested:
+          type: boolean
+          deprecated: true
+          description: |
+            **Deprecated** A flag for the Integrator to indicate that they would not like to have their Cardholder's debit cards tokenized.
+          example: "false"
+        merchantCategoryCodes:
+          type: array
+          maxItems: 200
+          description: |
+            Object for the array of Merchant Category Codes (MCC) that the Merchant processes transactions under, and is used for risk-scoring transactions by the issuer. All MCC codes that will be processed by a DPA should be provided here (typically, this will be a single item).
+
+            An MCC is a four-character code assigned by Mastercard to the Merchant that indicates the type of business, service, or product provided by the Merchant.
+
+            Note: MCC's may be assigned differently across payment networks. To avoid errors, be sure to use your assigned Mastercard MCC. This code is required for 3-D Secure (3DS) and risk profiling. If the Merchant has more than one MCC, the code most relevant to their business should be used.
+          example: "[0020,4442]"
+          items:
+            type: string
+            maxLength: 4
+        threeDSDefaultdata:
+          $ref: '#/components/schemas/ThreeDSDefaultData'
+        acquirerData:
+          items:
+            $ref: '#/components/schemas/AcquirerData'
+          type: array
+    Error:
+      type: object
+      description: |
+        An error object is associated with individual DPA failures in a given batch (assuming a COMPLETED_WITH_ERRORS response).
+
+        Please note: In the event of a SUCCESSFUL response, this error object may be sent as NULL.
+      required:
+        - status
+        - reason
+        - message
+      properties:
+        status:
+          format: int32
+          description: HTTP status code associated with the Digital Payment Application (DPA) item error.
+          example: 400, 401, 403, 500
+          type: integer
+        reason:
+          description: Reason for receiving an error for the Digital Payment Application (DPA) item.
+          example: "INVALID_VALUE"
+          type: string
+          enum:
+            - INVALID_ARGUMENT
+            - INVALID_VALUE
+            - NOT_FOUND
+            - DECLINED
+            - INVALID_STATE
+            - AUTHENTICATION_FAILED
+            - INTERNAL_SERVER_ERROR
+        message:
+          description: Additional details on the Digital Payment Application (DPA) item error.
+          example: "Bad request, see error object for details"
+          type: string
+        errordetail:
+          description: List of errors associated with a failed Digital Payment Application (DPA) item action.
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+          type: array
+    ErrorDetail:
+      type: object
+      description: Error associated with a failed Digital Payment Application (DPA) item action.
+      required:
+        - reason
+      properties:
+        reason:
+          description: Reason for receiving an error for the Digital Payment Application (DPA) item.
+          example: "INVALID_VALUE"
+          type: string
+          enum:
+            - INVALID_ARGUMENT
+            - INVALID_VALUE
+            - NOT_FOUND
+            - DECLINED
+            - INVALID_STATE
+            - AUTHENTICATION_FAILED
+            - INTERNAL_SERVER_ERROR
+        sourceType:
+          description: Indicates the source type of the Digital Payment Application (DPA) item error.
+          example: "Request"
+          type: string
+        message:
+          description: Additional details on the Digital Payment Application (DPA) item error.
+          example: "Invalid data"
+          type: string
+        source:
+          description: Indicates the field name for the cause of the Digital Payment Application (DPA) item error.
+          example: "dpas"
+          type: string
+    ThreeDSDefaultData:
+      type: object
+      description: Enables a Merchant to supply their existing 3-D Secure (3DS) integration details at the time of Digital Payment Application (DPA) registration.
+      properties:
+        defaultAcquirerBin:
+          type: string
+          description: |
+            Allows a Merchant to set a default Acquirer. An Acquirer BIN is an identifier assigned by Mastercard to an Acquirer.
+
+            If this field is not defined and acquirerData has only one entry, this field will be populated with the value from acquirerBin.
+          example: "112233"
+        defaultAcquirerMerchantId:
+          type: string
+          description: An identifier assigned to the Merchant by their Acquirer. If this field is not populated and acquirerData has only one entry, this field will be populated with the value from acquirerMerchantId.
+          example: "MC1234567891234"
+        defaultMerchantCountryCode:
+          type: string
+          description: |
+            Allows a Merchant to set a default Merchant Country Code (CC).
+
+            A Merchant CC is a two-character code indicating the country the Merchant is doing business in.
+          example: "US"
+        defaultMerchantCategoryCode:
+          type: string
+          description: |
+            Allows a Merchant to set a default Merchant Category Code (MCC).
+
+            An MCC is a four-character code assigned by Mastercard to the Merchant that indicates the type of business, service, or product provided by the Merchant.
+
+            Note: MCC's may be assigned differently across payment networks. To avoid errors, be sure to use your assigned Mastercard MCC. This code is required for 3-D Secure (3DS) and risk profiling. If the Merchant has more than one MCC, the code most relevant to their business should be used.
+          example: "4442"

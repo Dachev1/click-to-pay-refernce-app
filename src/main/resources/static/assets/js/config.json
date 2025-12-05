@@ -1,0 +1,22 @@
+{
+	"callNodeJsAPIUrl":"https://localhost:8080/callapi",
+	"callAPIUrl":"https://ktsrc.onrender.com/callapi.php",
+	"stageTransactionCredentailAPIEndPoint":"https://stage.api.mastercard.com/src/api/digital/payments/transaction/credentials",
+	"stageTransactionConfirmationAPIEndPoint":"https://stage.api.mastercard.com/src/api/confirmations",
+	"sandboxTransactionCredentailAPIEndPoint":"https://sandbox.api.mastercard.com/src/api/digital/payments/transaction/credentials",
+	"sandboxTransactionConfirmationAPIEndPoint":"https://sandbox.api.mastercard.com/src/api/confirmations",
+	"prodTransactionCredentailAPIEndPoint":"https://api.mastercard.com/src/api/transaction/transaction/credentials",
+	"prodTransactionConfirmationAPIEndPoint":"https://api.mastercard.com/src/api/confirmations",
+	"stagePublicKey":"https://stage.src.mastercard.com/keys",
+	"sandboxPublicKey":"https://sandbox.src.mastercard.com/keys",
+	"prodPublicKey":"https://src.mastercard.com/keys",
+	"decryptUrl":"https://localhost:8080/decrypt",
+	"stagehost":"stage.api.mastercard.com",
+	"sandboxhost":"sandbox.api.mastercard.com",
+	"productionhost":"api.mastercard.com",
+	"transactionCredentialsRelativeURL":"/src/api/digital/payments/transaction/credentials",
+	"transactionConfirmationRelativeURL":"/src/api/confirmations",
+	"nodeJSSBSAPIUrl":"https://localhost:8080/oauthsbs",
+	"nodeJSAuthAPIUrl":"https://localhost:8080/oauth",
+	"nodeJSStatsAPIUrl":"https://localhost:8080/stats"
+}

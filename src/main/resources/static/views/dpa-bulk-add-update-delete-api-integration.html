@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>MCS Click To Pay - Merchant Registration API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8" />
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/fontawesome/css/all.min.css" />
+
+    <script src="/assets/js/jquery.min.js"></script>
+    <script src="/assets/js/jquery.validate.min.js"></script>
+
+    <script src="/assets/js/environment.js"></script>
+
+    <script src="/assets/js/dpa-bulk-add-update-delete.js"></script>
+    <script src="/assets/js/common.js"></script>
+
+
+    <!-- Font Awesome CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link rel="icon" type="image/svg" href="/assets/images/favicon.svg">
+
+</head>
+
+<body>
+    <div class="container-fluid p-0">
+        <!-- Main Header Start Here -->
+        <nav class="mc-oba-header">
+            <div class="mc-oba-header-left">
+                <img src="/assets/images/mc_symbol_opt_73_3x.png" alt="Mastercard" class="mc-oba-logo" />
+                <a href="https://developer.mastercard.com/mastercard-checkout-solutions/documentation/use-cases/click-to-pay/"
+                    class="mc-oba-developers-link" target="_blank">
+                    developers<i class="fa-solid fa-arrow-up-right-from-square"></i>
+
+                </a>
+            </div>
+            <div class="mc-oba-header-center">
+                <span class="mc-oba-header-app">REFERENCE APP</span>
+                <span class="mc-oba-header-title">MCS - Click to Pay</span>
+            </div>
+            <div class="mc-oba-header-right">
+                <a href="https://developer.mastercard.com/mastercard-checkout-solutions/documentation/api-reference/apis/"
+                    class="mc-oba-github-link" target="_blank">
+                    API Reference
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Header End Here -->
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mt-0 mb-0 api-form-box">
+            <!-- API Name Header Start Here -->
+            <div class="row mb-3 api-name-border pb-3">
+                <div class="col-xl-1 col-lg-1 col-md-1 col-sm-1 col-2 d-flex align-items-center">
+                    <a href="/" class="text-decoration-none">
+                        <img class="back-logo" src="/assets/images/back_icon@2x.png" alt="Back Logo" />
+                    </a>
+                </div>
+                <div
+                    class="col-xl-11 col-lg-11 col-md-11 col-sm-11 col-10 d-flex align-items-center justify-content-center p-0">
+                    <span class="api-name-label"> MCS Click To Pay - Merchant Registration API </span>
+                </div>
+            </div>
+            <!-- API Name Header End Here -->
+
+
+            <!-- Sub Navigation Start Here -->
+            <div class="row mt-3">
+                <div
+                    class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 d-flex align-items-center justify-content-center api-menu-sub-label text-center padding-top-none">
+                    <a class="api-names-box" href="#" data-action="ADD">
+                        <label class="api-label" for="add-dpa">ASYNCHRONOUS - DPA BULK ADD/UPDATE/DELETE</label>
+                    </a>
+                </div>
+                <div
+                    class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 d-flex align-items-center justify-content-center api-menu-sub-label text-center padding-top-none">
+                    <a class="api-names-box" href="get-status-api-integration.html" data-action="GET">
+                        <label class="api-label" for="delete-dpa">GET STATUS OF DPA</label>
+                    </a>
+                </div>
+            </div>
+            <!-- Sub Navigation Ends Here -->
+
+            <div class="container-fluid p-0 pt-4 pb-0">
+                <h2 class="mc-page-title">DPA Bulk Add / Update / Delete</h2>
+                <div class="mc-page-subtitle">Asynchronous Processing for DPA Requests</div>
+
+                <span class="mb-3 styled-line"></span>
+            </div>
+            <div class="content">
+                <form id="dpa-add-update-info-form">
+                    <input type="hidden" id="actionMode" value="ADD" />
+
+
+                    <div class="all-dpa-fields" id="all-dpa-fields">
+
+
+
+                        <div class="row">
+                            <div class="col-md-6 form-group">
+                                <label for="correlationId">Correlation Id:
+                                    <span data-toggle="tooltip" data-html="true"
+                                        title="<b>Info:<br>Header</b><br>Required. A unique identifier that correlates a series of two or more requests to a single session of activity. Mastercard Checkout Solutions (MCS) will return a new srcCorrelationId in each response by default, but Integrators may choose to populate previously used srcCorrelationIds in subsequent requests to correlate their activity under a single ID. This can be done by providing a Mastercard generated srcCorrelationId in the request, or by generating your own ID in the same format. SrcCorrelationId is used for tracking and troubleshooting purposes within Mastercard's ecosystem.<br><br>Required: True<br><br>Example: 0000016e0364631b-e4cefc<br><br>Type: String">
+                                        <i class="fas fa-info-circle"></i>
+                                    </span>
+                                </label>
+                                <input type="text" id="correlationId" name="correlationId" required class="form-control"
+                                    value="0000016e0364631b-e4cefc">
+                            </div>
+
+                            <div class="col-md-6 form-group">
+                                <label for="srcClientId">SRC Client Id:
+                                    <span data-toggle="tooltip" data-html="true"
+                                        title="<b>Info:<br>Path variable</b><br>Required. A unique identifier assigned by Mastercard during onboarding which signifies the responsible party Integrating to Mastercard Checkout Solutions (MCS).<br><br>Required: True<br><br>Example: 5e0d4b84-189d-4c86-822d-590602f62062<br><br>Type: String">
+                                        <i class="fas fa-info-circle"></i>
+                                    </span>
+                                </label>
+                                <input type="text" id="srcClientId" name="srcClientId" required class="form-control"
+                                    value="">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 form-group optional-dpa-section">
+                                <label for="noOfRequests">Number of Requests:
+                                    <span data-toggle="tooltip" data-html="true"
+                                        title="<b>Info:<br>Required. How many number of Requests user wants add.<br><br>Required: True<br><br>Example: Single Add/Update/Delete Request<br><br>Type: String">
+                                        <i class="fas fa-info-circle"></i>
+                                    </span>
+                                </label>
+                                <select id="noOfRequests" name="noOfRequests" class="form-control" required>
+                                    <option value="singleRequest" selected>Single Request</option>
+                                    <!-- <option value="multipleRequest">Multiple Request</option> -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <span class="ml-1 note"><i>*Note: The API currently supports processing only Single DPA
+                                        request at a time.</i></span>
+                            </div>
+                        </div>
+                        <div id="add-item-btn-wrapper" style="display:none;">
+                            <button type="button" class="btn btn-primary mb-3" id="add-item-btn">+ Add Request
+                                (Item)</button>
+                        </div>
+
+                        <div id="items-container" class="accordion"></div>
+
+
+
+
+                        <!-- Item template -->
+                        <script type="text/template" id="item-template">
+                            <div class="item-block mb-4 p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h3>DPA Request <span class="item-number"></span></h3>
+                                </div>
+                               
+                                <span class="mb-3 styled-line"></span>
+
+                                <div class="row">
+                                    <div class="col-md-6 form-group">
+                                        <label for="action">Action:
+                                            <span data-toggle="tooltip" data-html="true"
+                                                title="<b>Info:<br>Required. The action to be performed on the Digital Payment Application (DPA). The selected action will be applied to all DPAs provided in the items list.<br><br>Required: True<br><br>Example: Single ADD<br><br>Type: String">
+                                                <i class="fas fa-info-circle"></i>
+                                            </span>
+                                        </label>
+                                        <select id="action" name="action" class="form-control" required>
+                                            <option value="ADD" selected>Add</option>
+                                            <option value="UPDATE">Update</option>
+                                            <option value="DELETE">Delete</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+
+                                <div class="row optional-dpa-section">
+                                    <div class="col-md-6 form-group display-none">
+                                        <label for="requestId">Request Id:
+                                            <span data-toggle="tooltip" data-html="true"
+                                                title="<b>Info:</b><br>Optional. This field allows the Integrator to assign an internal reference to a batch request so that it can be used for internal tracking purposes.<br><br>Example: 48192<br><br>Type: String">
+                                                <i class="fas fa-info-circle"></i>
+                                            </span>
+                                        </label>
+                                        <input type="text" id="requestId" name="requestId" class="form-control" value="">
+                                    </div>
+
+                                    <div class="col-md-6 form-group display-none">
+                                        <label for="customerId">Customer Id:
+                                            <span data-toggle="tooltip" data-html="true"
+                                                title="<b>Info:</b><br>Conditional: The Customer Identifier (CID) must be passed when the Integrator is acting On-Behalf-Of (OBO) a client, registering through the Mastercard Connect (MC Connect) portal, or participating in the Secure Card on File (SCOF) program.This field should be populated with the CID of the Integrator's client (e.g., a Payment Service Provider (PSP) would pass the CID of the client they are integrating, i.e. DASP model).<br><br>Max Length: 60<br><br>Example: 100039<br><br>Type: String">
+                                                <i class="fas fa-info-circle"></i>
+                                            </span>
+                                        </label>
+                                        <input type="text" id="customerId" name="customerId" class="form-control" value="">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 form-group">
+                                        <label for="programType">Program Type:
+                                            <span data-toggle="tooltip" data-html="true" title="<b>Info:</b><br>Required. The Mastercard program that the Integrator would like to add their client(s) to. The Integrator must be enrolled in the program prior to enrolling their client(s). Integrators may view their active programs in the Mastercard Connect (MC Connect) portal. Valid values:<br>
+                                <br>*SECURE_COF_MERCHANT = Integrating Merchant managing network tokenization. Tokens generated are unique for each merchant.       
+                                <br>*SECURE_COF_MERCHANT_OBO = Integrating Payment Service Provider (PSP) managing network tokenization for their Merchant(s). Tokens generated are unique for each merchant.
+                                <br>*SECURE_COF_COMMERCE_PLATFORM = Integrating Commerce Platform managing network tokenization. Tokens are generated unique for each Commerce Platform (tokens will be shared among their marketplace).      
+                                <br>*SECURE_COF_COMMERCE_PLATFORM_OBO = ntegrating PSPs managing network tokenization for their Commerce Platform(s). Tokens are generated unique for each Commerce Platform (tokens will be shared among their marketplace).
+                                <br>*SECURE_COF_MERCHANT_OBO_SHARED = Integrating PSPs managing network tokenization for their sub-Merchants. Tokens generated are unique for each Merchant Group.
+                                <br>*SRC = Integrating Merchants and PSPs participating in or offering the Click to Pay (C2P) program.
+                                <br>*GUEST_CHECKOUT_TOKENIZATION = A checkout solution that uses an alternative identifier to Account PANs, generated by the issuing network for guest checkout tokenization.     
+                                <br>Note: Other programTypes (e.g., AUTOFILL, SQR_DEVICE etc.) may be available to select regions. Please contact your Mastercard representative for more details.
+                                <br>enum:
+                                <br>SRC
+                                <br>SECURE_COF_MERCHANT_OBO
+                                <br>SECURE_COF_MERCHANT
+                                <br>SECURE_COF_MERCHANT_OBO_SHARED
+                                <br>SECURE_COF_COMMERCE_PLATFORM
+                                <br>SECURE_COF_COMMERCE_PLATFORM_OBO
+                                <br>SQR_DEVICE
+                                <br>AUTOFILL
+                                <br>GUEST_CHECKOUT_TOKENIZATION<br><br>Required: True<br><br><br>Type: String">
+                                                <i class="fas fa-info-circle"></i>
+                                            </span>
+                                        </label>
+                                        <select name="programType" required class="form-control"
+                                            value="P2P"></select>
+                                    </div>
+
+                                    <div class="col-md-6 form-group optional-dpa-section display-none">
+                                        <label for="trid">TRID:
+                                            <span data-toggle="tooltip" data-html="true"
+                                                title="<b>Info:</b><br>Optional: The Token Requestor Identifier (TRID) should be passed by MDES for Merchants (M4M) Integrators who would like to onboard their M4M TRIDs to be used on Secure Card on File (SCOF).<br><br>Example: 50132184090<br><br>Type: String">
+                                                <i class="fas fa-info-circle"></i>
+                                            </span>
+                                        </label>
+                                        <input type="text" id="trid" name="trid" class="form-control" value="">
+                                    </div>
+
+                                     <div class="col-md-6 form-group optional-dpa-section">
+                                        <label for="serviceId">Service Id:
+                                            <span data-toggle="tooltip" data-html="true"
+                                                title="<b>Info:</b><br>Optional. A unique identifier assigned by Mastercard for which tokens are created uniquely for the entity onboarded.<br><br>Max Length: 255<br><br>Example: SECURE_COF_MERCHANT#TESTPROJECT_PROD-PGMNAME#01<br><br>Type: String">
+                                                <i class="fas fa-info-circle"></i>
+                                            </span>
+                                        </label>
+                                        <input type="text" id="serviceId" name="serviceId" class="form-control" value="">
+                                    </div>
+
+                                    <div class="col-md-6 form-group optional-dpa-section display-none">
+                                        <label for="category">Category:
+                                            <span data-toggle="tooltip" data-html="true"
+                                                title="<b>Info:</b><br>Optional - Assign a category to the sub-merchant group identified in the request. For example, sub-merchants can be grouped by common attributes such as merchant category code (MCC), volume of transactions, or geography. Required for the SECURE_COF_MERCHANT_OBO_SHARED program type. Examples: 'discount stores' and bakeries'.<br><br>Max Length: 255<br><br>Example: testCategory<br><br>Type: String">
+                                                <i class="fas fa-info-circle"></i>
+                                            </span>
+                                        </label>
+                                        <input type="text" id="category" name="category" class="form-control" value="">
+                                    </div>
+                                </div>
+
+                               
+
+
+                                <div class="row optional-dpa-section pb-3 mb-4 short-bottom-border">
+                                    <div class="col-md-6 form-group">
+                                        <label for="programName">Program Name:
+                                            <span data-toggle="tooltip" data-html="true"
+                                                title="<b>Info:</b><br>Optional. The Cardholder facing name of the Merchant. Conditional: Must be supplied when adding Merchants to all Secure Card On File (SECURE_COF) programs.<br><br>Max Length: 100<br><br>Example: myShop*pay<br><br>Type: String">
+                                                <i class="fas fa-info-circle"></i>
+                                            </span>
+                                        </label>
+                                        <input type="text" id="programName" name="programName" class="form-control"
+                                            value="myShop">
+                                    </div>
+
+                                </div>
+
+
+                                <div class="row">
+                                    <div class="col-md-6 form-group optional-dpa-section dpa-checkbox-left">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="dpaType" id="dpaType"
+                                                value="singleDpa" checked hidden>
+                                                <span class="custom-radio-indicator"></span>
+                                            <label class="form-check-label" for="dpaType">
+                                                Single DPA
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 form-group optional-dpa-section dpa-checkbox-right">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="dpaType" id="dpaType"
+                                                value="multipleDpa" hidden>
+                                                <span class="custom-radio-indicator"></span>
+                                            <label class="form-check-label dpa-label" for="dpaTypeMultiple">
+                                                Multiple DPA
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+
+                            <div class="d-flex justify-content-end mb-2">
+                                <button type="button" class="btn btn-secondary add-dpa-btn" style="display:none;">+ Add DPA</button>
+                            </div>
+
+                            <div class="dpas-container"></div>
+                                
+                            </div>
+                        </script>
+
+
+
+                    </div>
+
+
+                    <button type="submit" class="btn submit-btn mt-3">Submit</button>
+                    <span class="mb-3 mt-5 styled-line"></span>
+                </form>
+
+                <div class="single-dpa-fields dpa-template" style="display:none">
+
+                    <h3>DPA Configuration Details</h3>
+                    <span class="mb-3 styled-line"></span>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="srcDpaId">SRC DPA Id:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Required. The registered identifier for the Digital Payment Application (DPA) accessing the service. At least one DPA needs to be registered for each Merchant/Merchant OBO/Sub-Merchant (PF) needed, with additional DPAs being added as required. Conditional: Required if you are a Merchant directly integrating with Mastercard Checkout Solutions (MCS) APIs, a Payment Service Provider (PSP) integrating On-Behalf-Of (OBO) a Merchant, a Payment Facilitator, or if you are enrolling in the Secure Card on File (SCOF) QR program.<br><br>Required: True<br><br>Max Length: 255<br><br>Example: src_dpa_56068<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="srcDpaId" name="srcDpaId" class="form-control" value="" required>
+                        </div>
+
+                        <div class="col-md-6 form-group optional-dpa-section display-none">
+                            <label for="hasAcquirerRelationship">Has Acquirer Relationship:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. Indicates if the Digital Payment Application (DPA) has an Acquirer relationship. This field may be used to improve acceptance rates.<br><br>Example: yes<br><br>Type: Boolean">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <select id="hasAcquirerRelationship" name="hasAcquirerRelationship" class="form-control">
+                                <option value="" selected>--Select--</option>
+                                <option value="Y">Yes</option>
+                                <option value="N">No</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row optional-dpa-section">
+                        <div class="col-md-6 form-group display-none">
+                            <label for="subMerchantId">Sub Merchant Id:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. Identifier assigned to a Sub-Merchant by the Payment Facilitator (PF). This field may be used to improve transaction security and acceptance rates.<br><br>Example: merchant123125<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="subMerchantId" name="subMerchantId" class="form-control" value="">
+                        </div>
+
+                        <div class="col-md-6 form-group display-none">
+                            <label for="paymentFacilitatorId"> Payment Facilitator Id:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional - Payment Facilitator (PF) identifier that may be used to improve transaction security and acceptance rates.<br><br>Example: pfac123<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="paymentFacilitatorId" name="paymentFacilitatorId"
+                                class="form-control" value="">
+                        </div>
+                    </div>
+
+                    <div class="row optional-dpa-section">
+                        <div class="col-md-6 form-group">
+                            <label for="merchantCategoryCodes">Merchant Category Codes:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. A unique identifier assigned by Mastercard for which tokens are created uniquely for the entity onboarded.<br><br>Max Length: 255<br><br>Example: SECURE_COF_MERCHANT#TESTPROJECT_PROD-PGMNAME#01<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" name="merchantCategoryCodes[]" class="form-control" value="0020">
+                        </div>
+
+                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                            <input class="btn multiple-merchant-category-code-add-btn" id="merchantCategoryCodesBtnAdd"
+                                type="button" value="ADD MULTIPLE MERCHANT CATEGORY CODE" />
+                        </div>
+                        <br />
+                        <br />
+                        <br />
+                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12" id="merchant-category-codes-div">
+                            <!--Textboxes will be added here -->
+                        </div>
+
+                    </div>
+
+                    <h3 class="optional-dpa-section">DPA Details</h3>
+                    <span class="mb-3 styled-line optional-dpa-section"></span>
+                    <div class="row optional-dpa-section">
+                        <div class="col-md-6 form-group">
+                            <label for="dpaPresentationName">DPA Presentation Name:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. The name of the Merchant that the Cardholder will see when checking out with the Digital Payment Application (DPA).Conditional: Required for Guest Checkout Tokenization (GCT) and SQR programs.<br><br>Max Length: 255<br><br>Example: FieldTestDpa01_update12<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="dpaPresentationName" name="dpaPresentationName" class="form-control"
+                                value="FieldTestDpa01_update12">
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="dpaName">DPA Name:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional - pattern: ^[\\p{L}\\p{N}\\p{M}\\s#\'$&'*+,-.@_:{|}]+$. Legal name of Merchant (which may differ from dpaPresentationName). Only the special characters defined in the pattern are permitted.<br><br>Max Length: 60<br><br>Example: Ecom Holdings Online Inc<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="dpaName" name="dpaName" class="form-control"
+                                value="Ecom Holdings Online Inc">
+                        </div>
+                    </div>
+
+                    <div class="row optional-dpa-section">
+                        <div class="col-md-6 form-group">
+                            <label for="dpaLogoUri">DPA Logo URI:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. URI for the logo displayed to Cardholders during C2P checkout.<br><br>Max Length: 1024<br><br>Example: https://example.com/ecom-online-ltd/images/ecom-logo.png<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="dpaLogoUri" name="dpaLogoUri" class="form-control"
+                                value="https://example.com/ecom-online-ltd/images/ecom-logo.png">
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="dpaUri">DPA URI:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional - URI for your merchant's site for handling all Checkout transactions<br><br>Max Length: 1024<br><br>Example: http://www.myMerchant.com<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="dpaUri" name="dpaUri" class="form-control"
+                                value="https://example.com/ecom-online-ltd/basket.html">
+                        </div>
+                    </div>
+
+                    <h3 class="optional-dpa-section">DPA Address Details</h3>
+                    <span class="mb-3 styled-line optional-dpa-section"></span>
+
+                    <div class="row optional-dpa-section">
+                        <div class="col-md-6 form-group">
+                            <label for="name">Name:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. Contact name for the address.<br><br>Max Length: 75<br><br>Example: Ecom Online Store<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="name" name="name" class="form-control" value="Ecom Online Store">
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="line1">Line 1:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>First line of the address.<br><br>Max Length: 75<br><br>Example: 100 Avenue Lane Street<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="line1" name="line1" class="form-control"
+                                value="100 Avenue Lane Street">
+                        </div>
+                    </div>
+
+                    <div class="row optional-dpa-section">
+                        <div class="col-md-6 form-group">
+                            <label for="line2">Line 2:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. Second line of the address.<br><br>Max Length: 75<br><br>Example: Address line 2<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="line2" name="line2" class="form-control" value="Address line 2">
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="line3">Line 3:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. Third line of the address.<br><br>Max Length: 75<br><br>Example: Address line 3<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="line3" name="line3" class="form-control" value="Address line 3">
+                        </div>
+                    </div>
+
+                    <div class="row optional-dpa-section">
+                        <div class="col-md-6 form-group">
+                            <label for="city">City:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. City of the address.<br><br>Max Length: 50<br><br>Example: Metropolis<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="city" name="city" class="form-control" value="Metropolis">
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="state">State:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. State of the address.<br><br>Max Length: 30<br><br>Example: MH<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="state" name="state" class="form-control" value="MH">
+                        </div>
+                    </div>
+
+                    <div class="row optional-dpa-section">
+                        <div class="col-md-6 form-group">
+                            <label for="countryCode">Country Code:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. Address country code. ISO 3166 alpha 2 country code.<br><br>Max Length: 2<br><br>Example: US<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="countryCode" name="countryCode" class="form-control" value="US">
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="zip">Zip:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. Address zip/postal code.<br><br>Max Length: 20<br><br>Example: 41321<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="zip" name="zip" class="form-control" value="41321">
+                        </div>
+                    </div>
+
+                    <h3 class="optional-dpa-section">ThreeDS Default Data</h3>
+                    <span class="mb-3 styled-line optional-dpa-section"></span>
+
+                    <div class="row optional-dpa-section">
+                        <div class="col-md-6 form-group">
+                            <label for="defaultAcquirerBin">Default Acquirer Bin:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. Allows a Merchant to set a default Acquirer. An Acquirer BIN is an identifier assigned by Mastercard to an Acquirer. If this field is not defined and acquirerData has only one entry, this field will be populated with the value from acquirerBin.<br><br>Example: 112233<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="defaultAcquirerBin" name="defaultAcquirerBin" class="form-control"
+                                value="A123456">
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="defaultAcquirerMerchantId">Default Aquirer Merchant Id:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. An identifier assigned to the Merchant by their Acquirer. If this field is not populated and acquirerData has only one entry, this field will be populated with the value from acquirerMerchantId.<br><br>Example: MC1234567891234<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="defaultAcquirerMerchantId" name="defaultAcquirerMerchantId"
+                                class="form-control" value="M123456">
+                        </div>
+                    </div>
+
+                    <div class="row optional-dpa-section">
+                        <div class="col-md-6 form-group">
+                            <label for="defaultMerchantCountryCode">Default Merchant Country Code:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. Allows a Merchant to set a default Merchant Country Code (CC). A Merchant CC is a two-character code indicating the country the Merchant is doing business in.<br><br>Example: US<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="defaultMerchantCountryCode" name="defaultMerchantCountryCode"
+                                class="form-control" value="US">
+                        </div>
+
+                        <div class="col-md-6 form-group display-none">
+                            <label for="defaultMerchantCategoryCode">Default Merchant Category Code:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. Allows a Merchant to set a default Merchant Category Code (MCC). An MCC is a four-character code assigned by Mastercard to the Merchant that indicates the type of business, service, or product provided by the Merchant. Note: MCC's may be assigned differently across payment networks. To avoid errors, be sure to use your assigned Mastercard MCC. This code is required for 3-D Secure (3DS) and risk profiling. If the Merchant has more than one MCC, the code most relevant to their business should be used.<br><br>Example: 4442<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="defaultMerchantCategoryCode" name="defaultMerchantCategoryCode"
+                                class="form-control" value="">
+                        </div>
+                    </div>
+
+                    <h3 class="optional-dpa-section">Aquirer Data</h3>
+                    <span class="mb-3 styled-line optional-dpa-section"></span>
+
+                    <div class="acquirer-template" style="display:none;">
+                        <div class="row optional-dpa-section">
+                            <div class="col-md-6 form-group">
+                                <label for="acquirerIca">Aquirer ICA:
+                                    <span data-toggle="tooltip" data-html="true"
+                                        title="<b>Info:</b><br>Required. An Acquirer Interbank Card Association (ICA) value is an identifier assigned to the Acquirer by Mastercard.<br><br>Required: True<br><br>Example: 12345<br><br>Type: String">
+                                        <i class="fas fa-info-circle"></i>
+                                    </span>
+                                </label>
+                                <input type="text" id="acquirerIca" name="acquirerIca" class="form-control"
+                                    value="12345" required>
+                            </div>
+
+                            <div class="col-md-6 form-group">
+                                <label for="acquirerBin">Aquirer Bin:
+                                    <span data-toggle="tooltip" data-html="true"
+                                        title="<b>Info:</b><br>Optional. Each Acquirer Interbank Card Association (ICA) identifier may be assigned one or more BINs by Mastercard.<br><br>Example: 112233<br><br>Type: String">
+                                        <i class="fas fa-info-circle"></i>
+                                    </span>
+                                </label>
+                                <input type="text" id="acquirerBin" name="acquirerBin" class="form-control"
+                                    value="112233">
+                            </div>
+                        </div>
+
+                        <div class="row optional-dpa-section">
+                            <div class="col-md-6 form-group">
+                                <label for="acquirerMerchantId">Aquirer ICA:
+                                    <span data-toggle="tooltip" data-html="true"
+                                        title="<b>Info:</b><br>Required. A Merchant Identifier (MID) is a unique code assigned to the Merchant by the Acquirer once the Merchant has successfully opened an account. A MID identifies the Merchant to the Acquirer.<br><br>Required: True<br><br>Example: MC1234567891234<br><br>Type: String">
+                                        <i class="fas fa-info-circle"></i>
+                                    </span>
+                                </label>
+                                <input type="text" id="acquirerMerchantId" name="acquirerMerchantId"
+                                    class="form-control" value="MC1234567891234">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="acquirer-data-list">
+                        <!-- acquirerData entries injected here -->
+                    </div>
+                    <div class="optional-dpa-section">
+                        <button type="button" class="btn btn-link add-acquirer-btn">+ Add Acquirer Data</button>
+                    </div>
+                </div>
+
+                <div class="api-object-card mt-4" style="display: none;">
+                    <div class="api-object-header">
+                        <span class="api-object-icon"><i class="fa-solid fa-arrow-right"></i></span>
+                        Request Headers
+                        <button type="button" class="copy-json-btn" data-target="#requestHeadersContent" title="Copy">
+                            <i class="fa fa-copy"></i>
+                        </button>
+                    </div>
+                    <pre class="api-json-block" id="requestHeadersContent"></pre>
+                </div>
+
+                <div class="api-object-card mt-4">
+                    <div class="api-object-header">
+                        <span class="api-object-icon"><i class="fa-solid fa-code"></i></span>
+                        Request Object
+                        <button type="button" class="copy-json-btn" data-target="#requestBodyContent" title="Copy">
+                            <i class="fa fa-copy"></i>
+                        </button>
+                    </div>
+                    <pre class="api-json-block" id="requestBodyContent"></pre>
+                </div>
+
+                <div class="api-object-card mt-4">
+                    <div class="api-object-header">
+                        <span class="api-object-icon"><i class="fa-solid fa-code-branch"></i></span>
+                        Response Object
+                        <button type="button" class="copy-json-btn" data-target="#responseContent" title="Copy">
+                            <i class="fa fa-copy"></i>
+                        </button>
+                    </div>
+                    <pre class="api-json-block" id="responseContent"></pre>
+                </div>
+
+                <div class="api-object-card mt-4">
+                    <div class="api-object-header">
+                        <span class="api-object-icon"><i class="fa-solid fa-server"></i></span>
+                        Response Headers
+                        <button type="button" class="copy-json-btn" data-target="#mastercardResponseHeadersContent"
+                            title="Copy">
+                            <i class="fa fa-copy"></i>
+                        </button>
+                    </div>
+                    <pre class="api-json-block" id="mastercardResponseHeadersContent"></pre>
+                </div>
+
+
+            </div>
+        </div>
+        <div id="spinner" class=""></div>
+        <!-- Bootstrap JS and dependencies -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+        <script>
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip();
+            });
+        </script>
+</body>
+
+</html>

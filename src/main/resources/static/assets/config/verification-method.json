@@ -1,0 +1,10 @@
+[
+    {
+        "name": "Use of a 3-D Secure ACS",
+        "value": "01"
+    },
+    {
+        "name": "A shared secret between the Card Issuer and the Cardholder such as One Time Passcode (OTP), activation code",
+        "value": "04"
+    }
+]

@@ -1,0 +1,22 @@
+[
+    {
+        "name": "Created",
+        "value": "01"
+    },
+    {
+        "name": "Confirmed",
+        "value": "02"
+    },
+    {
+        "name": "Cancelled",
+        "value": "03"
+    },
+    {
+        "name": "Fraud Cancelled",
+        "value": "04"
+    },
+    {
+        "name": "Others",
+        "value": "05"
+    }
+]

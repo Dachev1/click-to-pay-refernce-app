@@ -1,0 +1,30 @@
+[
+    {
+        "name": "Authorise",
+        "value": "01"
+    },
+    {
+        "name": "Capture",
+        "value": "02"
+    },
+    {
+        "name": "Refund",
+        "value": "03"
+    },
+    {
+        "name": "Cancel",
+        "value": "04"
+    },
+    {
+        "name": "Fraud",
+        "value": "05"
+    },
+    {
+        "name": "Chargeback",
+        "value": "06"
+    },
+    {
+        "name": "Other",
+        "value": "07"
+    }
+]

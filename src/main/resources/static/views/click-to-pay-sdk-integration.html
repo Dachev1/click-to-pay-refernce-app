@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Mastercard - Click2Pay</title>
+    <link rel="icon" type="image/svg" href="/assets/images/favicon.svg">
+    <style>
+        .blink {
+            animation: blinker 2s linear infinite;
+            color: #1c87c9;
+            font-size: 15px;
+            font-weight: normal;
+            font-family: sans-serif;
+        }
+
+        @keyframes blinker {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .blink-one {
+            animation: blinker-one 1s linear infinite;
+        }
+
+        @keyframes blinker-one {
+            0% {
+                opacity: 0;
+            }
+        }
+
+        .blink-two {
+            animation: blinker-two 1.4s linear infinite;
+        }
+
+        @keyframes blinker-two {
+            100% {
+                opacity: 0;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/click-to-pay-sdk.css">
+    <link rel="stylesheet" href="/assets/css/modaldcfstyle.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+    <link rel="stylesheet" href="/assets/css/fontawesome/css/all.min.css" />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://sandbox.src.mastercard.com/sdk/srcsdk.mastercard.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/0.10.0/lodash.min.js"></script>
+    <script src="/assets/js/jquery.cookie.js"></script>
+    <script src="/assets/js/jwt-js-decode.min.js"></script>
+    <script type="text/javascript" src="/assets/js/pem2jwk.js"></script>
+    <script type="text/javascript" src="/assets/js/hybrid-crypto.min.js"></script>
+    <script type="text/javascript" src="/assets/js/jose.js"></script>
+
+    <script src="/assets/js/srcsandbox.js"></script>
+    <script src="https://sonicsdk.mastercard.com/assets/js/latest/js/mc-sonic.min.js"></script>
+    <script src="/assets/js/mc-sonic.min.js"></script>
+
+    <script type="text/javascript">
+        let checkoutIframe;
+        let iframeContainer;
+        let iframeBackground;
+        let suppressDCF = false;
+        let rememberMe = false;
+        let allowShipping = false;
+        let allowBilling = false;
+        let inlineDCF = false;
+        let confPayment = false;
+        let functionStats = false;
+        let recognized = false;
+        let authenticationType = false;
+        $(document).ready(function () {
+            let coll = document.getElementsByClassName("collapsible");
+            let i;
+
+            for (i = 0; i < coll.length; i++) {
+                coll[i].addEventListener("click", function () {
+                    this.classList.toggle("active");
+                    $("#content").fadeToggle("slow");
+                });
+            }
+            let collUI = document.getElementsByClassName("collapsibleUI");
+
+            for (i = 0; i < collUI.length; i++) {
+                collUI[i].addEventListener("click", function () {
+                    this.classList.toggle("active");
+                    $("#contentUI").fadeToggle("slow");
+                });
+            }
+            // Handler for .ready() called.
+            $('#transactionid').val(create_UUID());
+
+            $("#customInput").click(function () {
+                loadInputBox();
+            });
+            $("#inlineDCF").click(function () {
+                inlineDCF = this.checked;
+            });
+            $("#authenticationType").click(function () {
+                authenticationType = this.checked;
+                if (this.checked) {
+                    $("input[name=cryptogram][value='CARD_APPLICATION_CRYPTOGRAM_SHORT_FORM']").prop("checked", true);
+                    $("input[name=cryptogram]").prop("disabled", true);
+                }
+                else {
+                    $("input[name=cryptogram]").prop("disabled", false);
+                }
+            });
+
+            $('#show').click(function () {
+                $('#billingAdd').toggle("slide");
+            });
+
+            checkoutIframe = document.getElementById('checkoutIframe')
+            iframeContainer = document.getElementById('iframeContainer');
+            iframeBackground = document.getElementById('iframeBackground');
+            getConfig();
+
+            $("#suppressDCF").click(function () {
+                suppressDCF = this.checked;
+                if (this.checked) {
+                    inlineDCF = true;
+                    allowShipping = false;
+                    allowBilling = false;
+                    confPayment = false;
+                    $("#trRememberMe1").show();
+                    $("#trRememberMe2").show();
+                    $("#inlineDCF").prop('checked', true);
+                    $("#inlineDCF").prop('disabled', true);
+
+                    $("#shipping").prop('checked', false);
+                    $("#shipping").prop('disabled', true);
+
+                    $("#billing").prop('checked', false);
+                    $("#billing").prop('disabled', true);
+
+                    $("#confirmPayment").prop('checked', false);
+                    $("#confirmPayment").prop('disabled', true);
+                }
+                else {
+                    $("#trRememberMe1").hide();
+                    $("#trRememberMe2").hide();
+                    $("#inlineDCF").prop('disabled', false);
+                    $("#billing").prop('disabled', false);
+                    $("#shipping").prop('disabled', false);
+                    $("#confirmPayment").prop('disabled', false);
+
+                    rememberMe = false;
+                    $("#rememberMe1").prop('checked', false);
+                    $("#rememberMe2").prop('checked', false);
+                }
+            });
+            $("#rememberMe1").click(function () {
+                rememberMe = this.checked;
+                $("#rememberMe2").prop('checked', this.checked);
+            });
+            $("#rememberMe2").click(function () {
+                rememberMe = this.checked;
+                $("#rememberMe1").prop('checked', this.checked);
+            });
+            $("#shipping").click(function () {
+                allowShipping = this.checked;
+            });
+            $("#billing").click(function () {
+                allowBilling = this.checked;
+            });
+            $("#confirmPayment").click(function () {
+                confPayment = this.checked;
+            });
+        });
+        function showCheckoutIframe() {
+            iframeContainer.classList.add('show')
+            document.body.classList.add('modal-visible')
+        }
+
+        function dismissCheckoutIframe() {
+            iframeContainer.classList.remove('show')
+            document.body.classList.remove('modal-visible')
+        }
+        function openTab(evt, tabName) {
+            let i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" activetab", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " activetab";
+        }
+
+        function openTab1(evt, tabName) {
+            let i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent1");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks1");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" activetab", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " activetab";
+        }
+
+        function showTab1(btnName, tabName) {
+            let i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent1");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks1");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" activetab", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            document.getElementById(btnName).className += " activetab";
+        }
+
+        function MyAlert(message) {
+            $.alert({
+                title: 'Alert!',
+                useBootstrap: false,
+                content: message
+            });
+        }
+
+
+    </script>
+    <script src="/assets/js/srcsdkTester.js"></script>
+</head>
+
+<body>
+<div id="animationStep" class=" full">
+    <table id="srcForSonic" style="width:100%">
+        <thead>
+        <tr>
+            <th colspan="2">
+                <div class="row" id="myHeader">
+                    <div class="d-inline">Mastercard Checkout Services - &nbsp;
+                        <img alt="Test"
+                             src="data:image/png;base64,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"
+                             class="src mr-1">
+                    </div>
+                    <div class="d-inline"><img alt="mastercard_icon_1"
+                                               src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMzJweCIgaGVpZ2h0PSIyMHB4IiB2aWV3Qm94PSIwIDAgMzIgMjAiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8IS0tIEdlbmVyYXRvcjogU2tldGNoIDU4ICg4NDY2MykgLSBodHRwczovL3NrZXRjaC5jb20gLS0+CiAgICA8dGl0bGU+VUkgTmV0d29ya3MvTWFzdGVyY2FyZDwvdGl0bGU+CiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4KICAgIDxnIGlkPSJQYWdlLTEiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxnIGlkPSJ2M19tYXJrX2RhcmtfU18xNnB4IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtNDIuMDAwMDAwLCAtMS4wMDAwMDApIj4KICAgICAgICAgICAgPGcgaWQ9IlVJLU5ldHdvcmtzL01hc3RlcmNhcmQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQyLjAwMDAwMCwgMS4wMDAwMDApIj4KICAgICAgICAgICAgICAgIDxnIGlkPSJtY19zeW1ib2wiPgogICAgICAgICAgICAgICAgICAgIDxyZWN0IGlkPSJSZWN0YW5nbGUiIGZpbGw9IiNGRjVGMDAiIGZpbGwtcnVsZT0ibm9uemVybyIgeD0iMTEuMzE0ODcxOCIgeT0iMi4yMzAxMzY5OSIgd2lkdGg9IjkuNDc5NjU4MSIgaGVpZ2h0PSIxNS41MDk1ODkxIj48L3JlY3Q+CiAgICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTEyLjI5MTI4Miw5Ljk4NjMwMTM1IEMxMi4yODg5MDE5LDYuOTYwMjc0MzUgMTMuNjc1NjUzNiw0LjEwMTE5OTY1IDE2LjA1MTk2NTgsMi4yMzI4NzY3MSBDMTIuMDE0OTg1NCwtMC45NDUxOTEyOTUgNi4yMTc3MTk2LC0wLjQ4MjI3ODIwNSAyLjczNDMzMTA1LDMuMjk2MjkzMSBDLTAuNzQ5MDU3NTEsNy4wNzQ4NjQ0IC0wLjc0OTA1NzUxLDEyLjkwMDQ3ODEgMi43MzQzMzEwNSwxNi42NzkwNDkzIEM2LjIxNzcxOTYsMjAuNDU3NjIwNiAxMi4wMTQ5ODU0LDIwLjkyMDUzMzggMTYuMDUxOTY1OCwxNy43NDI0NjU4IEMxMy42NzQ4OTc0LDE1Ljg3MzU0OTUgMTIuMjg4MDYwOSwxMy4wMTMyODk4IDEyLjI5MTI4Miw5Ljk4NjMwMTM1IFoiIGlkPSJQYXRoIiBmaWxsPSIjRUIwMDFCIiBmaWxsLXJ1bGU9Im5vbnplcm8iPjwvcGF0aD4KICAgICAgICAgICAgICAgICAgICA8cG9seWdvbiBpZD0iUGF0aCIgZmlsbD0iI0Y3OUUxQiIgZmlsbC1ydWxlPSJub256ZXJvIiBwb2ludHM9IjMwLjg1OTgzMDUgMTYuMjA3MDk2OCAzMC44NTk4MzA1IDE1Ljg3NTI5OTYgMzAuOTk1NDIzOCAxNS44NzUyOTk2IDMwLjk5NTQyMzggMTUuODIgMzAuNjcgMTUuODIgMzAuNjcgMTUuODc1Mjk5NiAzMC44MDU1OTMyIDE1Ljg3NTI5OTYgMzAuODA1NTkzMiAxNi4yMDcwOTY4Ij48L3BvbHlnb24+CiAgICAgICAgICAgICAgICAgICAgPHBvbHlnb24gaWQ9IlBhdGgiIGZpbGw9IiNGNzlFMUIiIGZpbGwtcnVsZT0ibm9uemVybyIgcG9pbnRzPSIzMS40ODM4OTgzIDE1LjgyIDMxLjM3NTQyMzcgMTUuODIgMzEuMjY2OTQ5MSAxNi4wOTY0OTc3IDMxLjE1ODQ3NDYgMTUuODIgMzEuMDUgMTUuODIgMzEuMDUgMTYuMjA3MDk2OCAzMS4xMzEzNTU5IDE2LjIwNzA5NjggMzEuMTMxMzU1OSAxNS45MDI5NDkzIDMxLjIyMTUyNzEgMTYuMTUxNzk3MyAzMS4zMjExODY0IDE2LjE1MTc5NzMgMzEuNDA4NDAxNSAxNS45MDI5NDkzIDMxLjQwODQwMTUgMTYuMjA3MDk2OCAzMS40ODM4OTgzIDE2LjIwNzA5NjgiPjwvcG9seWdvbj4KICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMzEuOTgzNTg5OCw5Ljk4NjMwMTM1IEMzMS45ODM1ODk4LDEzLjc2MjU2OTkgMjkuODMwOTUyOCwxNy4yMDczMDE0IDI2LjQ0MDEzODIsMTguODU3NTA1MiBDMjMuMDQ5MzIzNywyMC41MDc3MDg5IDE5LjAxNTU0NTksMjAuMDczNjY5OCAxNi4wNTE5NjU4LDE3LjczOTcyNjEgQzE4LjQyNzI0MTEsMTUuODY5ODE3IDE5LjgxNDA5NzMsMTMuMDExMTIyNCAxOS44MTQwOTczLDkuOTg0OTMxNSBDMTkuODE0MDk3Myw2Ljk1ODc0MDcgMTguNDI3MjQxMSw0LjEwMDA0NjA3IDE2LjA1MTk2NTgsMi4yMzAxMzY5OSBDMTkuMDE1NTQ1OSwtMC4xMDM4MDY4MDEgMjMuMDQ5MzIzNywtMC41Mzc4NDU4NyAyNi40NDAxMzgyLDEuMTEyMzU3ODQgQzI5LjgzMDk1MjgsMi43NjI1NjE1NSAzMS45ODM1ODk4LDYuMjA3MjkzMDUgMzEuOTgzNTg5OCw5Ljk4MzU2MTY1IEwzMS45ODM1ODk4LDkuOTg2MzAxMzUgWiIgaWQ9IlBhdGgiIGZpbGw9IiNGNzlFMUIiIGZpbGwtcnVsZT0ibm9uemVybyI+PC9wYXRoPgogICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4="
+                                               class="mastercard mr-1"></div>
+                    <div class="d-inline"><img alt="mastercard_icon_2"
+                                               src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMzUiIGhlaWdodD0iMTEiIHZlcnNpb249IjEuMSI+PHJlY3QgaWQ9ImJhY2tncm91bmRyZWN0IiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4PSIwIiB5PSIwIiBmaWxsPSJub25lIiBzdHJva2U9Im5vbmUiLz4KICAgIDwhLS0gR2VuZXJhdG9yOiBTa2V0Y2ggNTggKDg0NjYzKSAtIGh0dHBzOi8vc2tldGNoLmNvbSAtLT4KICAgIDx0aXRsZT5WaXNhLUJyYW5kLU1hcmstQmx1ZTwvdGl0bGU+CiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4KICAgIAo8ZyBjbGFzcz0iY3VycmVudExheWVyIiBzdHlsZT0iIj48dGl0bGU+TGF5ZXIgMTwvdGl0bGU+PGcgaWQ9IlN5bWJvbHMiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSIjZmZmZmZmIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsYXNzPSIiIGZpbGwtb3BhY2l0eT0iMSI+CiAgICAgICAgPGcgaWQ9IlVJLU5ldHdvcmtzL1Zpc2EvZGFyayIgZmlsbD0iI2ZmZmZmZiIgZmlsbC1ydWxlPSJub256ZXJvIiBmaWxsLW9wYWNpdHk9IjEiPgogICAgICAgICAgICA8ZyBpZD0iVmlzYS1CcmFuZC1NYXJrLUJsdWUiIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMSI+CiAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMTMuMjg5MjcyNjk5OTk5OTk4LDAuMTkzOTc4NDk0OTk5OTk5NjQgTDguNzA2NjUzMDkwMDAwMDAzLDEwLjgzNDQwODYgTDUuNzE2OTMxMzQwMDAwMDAyLDEwLjgzNDQwODYgTDMuNDYyODkxNzk5OTk5OTk0LDIuMzQxOTM1NDggQzMuMzI1MTUzOTQwMDAwMDA3LDEuODE4MzUxMjQ5OTk5OTk5MiAzLjIwNjg2MTQzMDAwMDAwMzYsMS42Mjc1MjY4ODAwMDAwMDEzIDIuNzkwNDA2OTU5OTk5OTk4NSwxLjQwNjczODM1MDAwMDAwMTIgQzIuMTExNDQwMzQwMDAwMDAxNSwxLjA0NzE2ODQ2MDAwMDAwMTcgMC45ODg0NzE2ODg5OTk5OTM2LDAuNzExMjU0NDgwMDAwMDAwOSAwLDAuNTAxNTA1Mzc2MDAwMDAwOCBMMC4wNjgwNTg3MDYzOTk5OTUxMiwwLjE5MjQwMTQzNDAwMDAwMDY1IEw0Ljg4MDc4MTUxOTk5OTk5OSwwLjE5MjQwMTQzNDAwMDAwMDY1IEM1LjQ5MzMwOTg3OTk5OTk5OCwwLjE5MjQwMTQzNDAwMDAwMDY1IDYuMDQ1ODgxNzUwMDAwMDA3LDAuNTg5ODIwNzg5MDAwMDAwOSA2LjE4NTI0MDA1OTk5OTk5OCwxLjI3NzQxOTM0OTk5OTk5ODggTDcuMzc2MjY3NDIwMDAwMDA1LDcuNDM1ODQyMjkgTDEwLjMxODk5NjIsMC4xOTM5Nzg0OTQ5OTk5OTk2NCBMMTMuMjg5MjcyNjk5OTk5OTk4LDAuMTkzOTc4NDk0OTk5OTk5NjQgek0yNS4wMDM0NzIzOTk5OTk5OTMsNy4zNjAxNDMzNjk5OTk5OTkgQzI1LjAxNDgxNTQ5OTk5OTk5Nyw0LjU1MTM5Nzg1MDAwMDAwMSAyMS4wMTIzMTU0MDAwMDAwMDYsNC4zOTY4NDU4ODAwMDAwMDEgMjEuMDM5ODYyOTk5OTk5OTk3LDMuMTQzMDgyNDQwMDAwMDAwNiBDMjEuMDQ3OTY1MTk5OTk5OTkzLDIuNzYxNDMzNjkwMDAwMDAwNSAyMS40MjIyODgxMDAwMDAwMDMsMi4zNTYxMjkwMjk5OTk5OTggMjIuMjM4OTkyNDk5OTk5OTk1LDIuMjUyMDQzMDEwMDAwMDAxMyBDMjIuNjQ0MTAzOTAwMDAwMDA1LDIuMTk5OTk5OTk5OTk5OTk5MyAyMy43NjA1OTA4MDAwMDAwMDMsMi4xNjA1NzM0OCAyNS4wMjc3NzkxMDAwMDAwMDQsMi43MjgzMTU0MTAwMDAwMDA0IEwyNS41MjM2MzU0MDAwMDAwMDMsMC40NzE1NDEyMTg5OTk5OTg4IEMyNC44NDMwNDgyOTk5OTk5OTIsMC4yMzAyNTA4OTYwMDAwMDExNSAyMy45NjgwMDc3OTk5OTk5OTUsMCAyMi44Nzc0NDgsMCBDMjAuMDgyMTc5Njk5OTk5OTk4LDAgMTguMTE0OTU5LDEuNDQ2MTY0ODcwMDAwMDAwNSAxOC4wOTcxMzQxMDAwMDAwMDUsMy41MTg0MjI5NDAwMDAwMDA3IEMxOC4wNzkzMDkxOTk5OTk5OTcsNS4wNDk3NDkxIDE5LjUwMjA2MDI5OTk5OTk5Nyw1LjkwNDUxNjEzMDAwMDAwMSAyMC41NzMxNzQ2OTk5OTk5OTYsNi40MTM5MDY4MSBDMjEuNjc1MDc3NSw2LjkzNTkxMzk3OTk5OTk5OSAyMi4wNDQ1MzkxMDAwMDAwMSw3LjI3MDI1MDkwMDAwMDAwMSAyMi4wMzk2Nzc3OTk5OTk5OTMsNy43MzU0ODM4Njk5OTk5OTk1IEMyMi4wMzMxOTYwMDAwMDAwMDQsOC40NDk4OTI0NzAwMDAwMDIgMjEuMTYxMzk2NCw4Ljc2MzcyNzYgMjAuMzQ3OTMyNzk5OTk5OTk1LDguNzc2MzQ0MDkwMDAwMDAyIEMxOC45MjUxODE2OTk5OTk5OTYsOC43OTg0MjI5NDAwMDAwMDIgMTguMTAwMzc1LDguNDAyNTgwNjUgMTcuNDQyNDc0MTk5OTk5OTkyLDguMTA0NTE2MTMgTDE2LjkzMDQxMzM5OTk5OTk5MiwxMC40MzU0MTIyMDAwMDAwMDIgQzE3LjU5MTU1NTIwMDAwMDAwMiwxMC43MzAzMjI2MDAwMDAwMDEgMTguODEwMTMwMDk5OTk5OTk1LDEwLjk4NzM4MzUgMjAuMDc1Njk3ODk5OTk5OTk0LDExIEMyMy4wNTA4MzU2OTk5OTk5OTMsMTEgMjQuOTkzNzQ5Njk5OTk5OTk1LDkuNTcxMTgyODAwMDAwMDAzIDI1LjAwMzQ3MjM5OTk5OTk5Myw3LjM2MDE0MzM2OTk5OTk5OSBMMjUuMDAzNDcyMzk5OTk5OTkzLDcuMzYwMTQzMzY5OTk5OTk5IHpNMzIuMzg0NjAxMSwxMC44MzQ0MDg2IEwzNSwxMC44MzQ0MDg2IEwzMi43MTY3OTI0LDAuMTkzOTc4NDk0OTk5OTk5NjQgTDMwLjMwMjMyODc5OTk5OTk5OCwwLjE5Mzk3ODQ5NDk5OTk5OTY0IEMyOS43NTk0Nzk2LDAuMTkzOTc4NDk0OTk5OTk5NjQgMjkuMzAyNTE0MDAwMDAwMDAyLDAuNTAxNTA1Mzc2MDAwMDAwOCAyOS4wOTgzMzc5MDAwMDAwMDQsMC45NzQ2MjM2NTU5OTk5OTg2IEwyNC44NTYwMTE5LDEwLjgzNDQwODYgTDI3LjgyNjI4ODMsMTAuODM0NDA4NiBMMjguNDE2MTMwNCw5LjI0NDczMTE4MDAwMDAwMiBMMzIuMDQ0MzA3Niw5LjI0NDczMTE4MDAwMDAwMiBMMzIuMzg0NjAxMSwxMC44MzQ0MDg2IHpNMjkuMjI5NTk0LDcuMDYzNjU1OTEwMDAwMDAxIEwzMC43MTg3ODMzLDMuMDY3MzgzNTA5OTk5OTk5IEwzMS41NzU5OTg5MDAwMDAwMDIsNy4wNjM2NTU5MTAwMDAwMDEgTDI5LjIyOTU5NCw3LjA2MzY1NTkxMDAwMDAwMSB6TTE3LjMzMDY2MzUsMC4xOTM5Nzg0OTQ5OTk5OTk2NCBMMTQuOTkyMzYwOCwxMC44MzQ0MDg2IEwxMi4xNjQ2ODM2MDAwMDAwMDQsMTAuODM0NDA4NiBMMTQuNTA0NjA2Njk5OTk5OTk3LDAuMTkzOTc4NDk0OTk5OTk5NjQgTDE3LjMzMDY2MzUsMC4xOTM5Nzg0OTQ5OTk5OTk2NCB6IiBpZD0iU2hhcGUiIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMSIvPgogICAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgPC9nPjwvZz48L3N2Zz4="
+                                               class="visa mr-2"></div>
+                    <div class="d-inline"><img alt="mastercard_icon_3"
+                                               src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMjJweCIgaGVpZ2h0PSIyMnB4IiB2aWV3Qm94PSIwIDAgMjIgMjIiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8IS0tIEdlbmVyYXRvcjogU2tldGNoIDU4ICg4NDY2MykgLSBodHRwczovL3NrZXRjaC5jb20gLS0+CiAgICA8dGl0bGU+VUkgTmV0d29ya3MvQU1FWDwvdGl0bGU+CiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4KICAgIDxnIGlkPSJQYWdlLTEiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxnIGlkPSJ2M19tYXJrX2RhcmtfU18xNnB4IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMTIxLjAwMDAwMCwgMC4wMDAwMDApIj4KICAgICAgICAgICAgPGcgaWQ9IlVJLU5ldHdvcmtzL0FNRVgiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyMS4wMDAwMDAsIDAuMDAwMDAwKSI+CiAgICAgICAgICAgICAgICA8ZyBpZD0iQW1leC01MDB4NTAwQDF4Ij4KICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlIiBmaWxsPSIjRkZGRkZGIiBmaWxsLXJ1bGU9Im5vbnplcm8iIHg9IjAiIHk9IjAiIHdpZHRoPSIyMS45NTAxMTM0IiBoZWlnaHQ9IjIxLjk1MDExMzQiPjwvcmVjdD4KICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMCwwIEwwLDIxLjk1MDExMzQgTDIxLjk1MDExMzQsMjEuOTUwMTEzNCBMMjEuOTUwMTEzNCwxOC40NzIwMzAxIEwxOS4zMDIwMDc4LDE4LjQ3MjAzMDEgTDE3LjkzODY0MjQsMTYuOTY0NDk2MyBMMTYuNTY4Mzg0NiwxOC40NzIwMzAxIEw3LjgzNzM3NTc4LDE4LjQ3MjAzMDEgTDcuODM3Mzc1NzgsMTEuNDQ1OTc0NCBMNS4wMTkzNzYzMywxMS40NDU5NzQ0IEw4LjUxNDgwMDE4LDMuNTM1NTA0NzYgTDExLjg4NTgxMDgsMy41MzU1MDQ3NiBMMTMuMDg5MTU5OSw2LjI0NTUwOTY2IEwxMy4wODkxNTk5LDMuNTM1NTA0NzYgTDE3LjI2MTgzMjYsMy41MzU1MDQ3NiBMMTcuOTg2MzE4LDUuNTc3NjExNjEgTDE4LjcxNTU0NDcsMy41MzU1MDQ3NiBMMjEuOTUwMTEzNCwzLjUzNTUwNDc2IEwyMS45NTAxMTM0LDAgTDAsMCBaIE0xOS4zNzAwNTMyLDQuNDE1MjIxNDEgTDE3Ljk5MjI0NDUsOC4yNDEyNTc4NyBMMTYuNjIzMzAzOCw0LjQxNTIyMTQxIEwxMy45OTk0MzExLDQuNDE1MjIxNDEgTDEzLjk5OTQzMTEsMTAuNTU4MDkyMyBMMTUuNjU3OTgxNywxMC41NTgwOTIzIEwxNS42NTc5ODE3LDYuMjU4MDY1MTIgTDE3LjIzNzY4NzQsMTAuNTU4MDkyMyBMMTguNzExODU3MSwxMC41NTgwOTIzIEwyMC4yOTE0MzExLDYuMjQ5MTk3MjggTDIwLjI5MTQzMTEsMTAuNTU4MDkyMyBMMjEuOTUwMTEzNCwxMC41NTgwOTIzIEwyMS45NTAxMTM0LDQuNDE1MjIxNDEgTDE5LjM3MDA1MzIsNC40MTUyMjE0MSBaIE05LjEyOTEzOTk1LDQuNDE1MjIxNDEgTDYuNDE3Mzc5MDUsMTAuNTU4MDkyMyBMOC4yNjAyNjY2NywxMC41NTgwOTIzIEw4Ljc2OTMzMzcsOS4zMjk1MDA1OSBMMTEuNTk0OTcxOCw5LjMyOTUwMDU5IEwxMi4xMTI3MzExLDEwLjU1ODA5MjMgTDEzLjk5OTQzMTEsMTAuNTU4MDkyMyBMMTEuMjg3OTc3NSw0LjQxNTIyMTQxIEw5LjEyOTEzOTk1LDQuNDE1MjIxNDEgWiBNMTAuMTgyMTc0Nyw1Ljk0MjExNTE5IEwxMS4wMTU4ODM5LDcuOTUxNjkxOTcgTDkuMzQ4NDIxNTksNy45NTE2OTE5NyBMMTAuMTgyMTc0Nyw1Ljk0MjExNTE5IFogTTE5Ljc4MzExMDQsMTEuNDQ5NDg2NCBMMTcuOTg0MjEwOCwxMy40MTUyNTA4IEwxNi4yMDI2MDc5LDExLjQ0OTQ4NjQgTDE0LjAwMDA0NTcsMTEuNDQ5NDg2NCBMMTYuODk1OTI0MiwxNC41MjA5NjU4IEwxNC4wMDAwNDU3LDE3LjU5MjQwMTMgTDE2LjE0MTI3OTMsMTcuNTkyNDAxMyBMMTcuOTQ5MDQ2NywxNS42MDkwNzY4IEwxOS43NDgwNzgsMTcuNTkyNDAxMyBMMjEuOTUwMTEzNCwxNy41OTI0MDEzIEwxOS4wMzcyNDU1LDE0LjUwMzM2MTggTDIxLjk1MDExMzQsMTEuNDQ5NDg2NCBMMTkuNzgzMTEwNCwxMS40NDk0ODY0IFogTTguNzY5NzcyNywxMS40NDk0ODY0IEw4Ljc2OTc3MjcsMTcuNTkyNDAxMyBMMTMuOTk5OTE0LDE3LjU5MjQwMTMgTDEzLjk5OTkxNCwxNi4xNzA3MzYzIEwxMC40NDU5NzEyLDE2LjE3MDczNjMgTDEwLjQ0NTk3MTIsMTUuMjE0MTk0MyBMMTMuOTEyMjAxNCwxNS4yMTQxOTQzIEwxMy45MTIyMDE0LDEzLjgyNzU2MTcgTDEwLjQ0NTk3MTIsMTMuODI3NTYxNyBMMTAuNDQ1OTcxMiwxMi44NzExOTUzIEwxMy45OTk5MTQsMTIuODcxMTk1MyBMMTMuOTk5OTE0LDExLjQ0OTQ4NjQgTDguNzY5NzcyNywxMS40NDk0ODY0IFogTTIwLjI2MzI0NzIsMTQuNTA1OTUxOSBMMjEuOTUwMTEzNCwxNi4zMDA1NDkzIEwyMS45NTAxMTM0LDEyLjcyNjMyNDUgTDIwLjI2MzI0NzIsMTQuNTA1OTUxOSBaIiBpZD0iNTAweDUwMCIgZmlsbD0iIzAwNkZDRiIgZmlsbC1ydWxlPSJub256ZXJvIj48L3BhdGg+CiAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDwvZz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg=="
+                                               class="amex mr-1"></div>
+                    <div class="d-inline"><img alt="mastercard_icon_4"
+                                               src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDI0LjAuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHZpZXdCb3g9IjAgMCAzMS4yNyAyMCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMzEuMjcgMjA7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPHN0eWxlIHR5cGU9InRleHQvY3NzIj4KCS5zdDB7ZmlsbDojRkZGRkZGO30KCS5zdDF7Y2xpcC1wYXRoOnVybCgjU1ZHSURfMl8pO2ZpbGw6I0Y2OEMxRTt9Cgkuc3Qye2NsaXAtcGF0aDp1cmwoI1NWR0lEXzJfKTtmaWxsOiMwMDAxMDU7fQoJLnN0M3tjbGlwLXBhdGg6dXJsKCNTVkdJRF8yXyk7ZmlsbDojMjMxRjIwO30KPC9zdHlsZT4KPHJlY3QgeD0iLTAuMDMiIHk9Ii0wLjA0IiBjbGFzcz0ic3QwIiB3aWR0aD0iMzEuMzIiIGhlaWdodD0iMjAuMDgiLz4KPGc+Cgk8ZGVmcz4KCQkKCQkJPHJlY3QgaWQ9IlNWR0lEXzFfIiB4PSI1LjYzIiB5PSItNS42MyIgdHJhbnNmb3JtPSJtYXRyaXgoMi41NTkyNTBlLTAzIC0xIDEgMi41NTkyNTBlLTAzIDUuNTkyOSAyNS42MDg4KSIgd2lkdGg9IjIwIiBoZWlnaHQ9IjMxLjI3Ii8+Cgk8L2RlZnM+Cgk8Y2xpcFBhdGggaWQ9IlNWR0lEXzJfIj4KCQk8dXNlIHhsaW5rOmhyZWY9IiNTVkdJRF8xXyIgIHN0eWxlPSJvdmVyZmxvdzp2aXNpYmxlOyIvPgoJPC9jbGlwUGF0aD4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0zMS4wNCwxMS4xNWMwLDAtOC41LDUuOTYtMjQuMDQsOC42bDI0LjAyLDAuMDZMMzEuMDQsMTEuMTV6Ii8+Cgk8cGF0aCBjbGFzcz0ic3QyIiBkPSJNMzEuMTgsMC4wNEwwLjAzLTAuMDRsLTAuMDUsMjBsMzEuMjcsMC4wOGwwLjA1LTIwTDMxLjE4LDAuMDR6IE0zMS4wNywwLjI3bC0wLjA1LDE5LjU1TDAuMiwxOS43MwoJCWMwLTAuMjIsMC4wNS0xOS4zMiwwLjA1LTE5LjU1QzAuNDcsMC4xOSwzMC44NCwwLjI3LDMxLjA3LDAuMjciLz4KCTxwYXRoIGNsYXNzPSJzdDIiIGQ9Ik0yLjc0LDYuMDlsLTEuMywwbC0wLjAxLDQuNTJsMS4yOSwwYzAuNjksMCwxLjE4LTAuMTYsMS42Mi0wLjUyYzAuNTItMC40MywwLjgyLTEuMDcsMC44My0xLjc0CgkJQzUuMTcsNy4wMiw0LjE4LDYuMDksMi43NCw2LjA5IE0zLjc3LDkuNDlDMy40OSw5Ljc0LDMuMTMsOS44NSwyLjU2LDkuODVsLTAuMjQsMGwwLjAxLTIuOTlsMC4yNCwwYzAuNTcsMCwwLjkyLDAuMSwxLjIxLDAuMzcKCQljMC4zLDAuMjcsMC40OSwwLjY5LDAuNDksMS4xM0M0LjI2LDguNzgsNC4wNyw5LjIyLDMuNzcsOS40OSIvPgoJCgkJPHJlY3QgeD0iMy43NSIgeT0iNy45MiIgdHJhbnNmb3JtPSJtYXRyaXgoMi41NTkyNTBlLTAzIC0xIDEgMi41NTkyNTBlLTAzIC0yLjM1ODEgMTQuMzUwOSkiIGNsYXNzPSJzdDIiIHdpZHRoPSI0LjUyIiBoZWlnaHQ9IjAuODgiLz4KCTxwYXRoIGNsYXNzPSJzdDIiIGQ9Ik04LjYyLDcuODRjLTAuNTMtMC4yLTAuNjgtMC4zMy0wLjY4LTAuNTdjMC0wLjI5LDAuMjgtMC41LDAuNjYtMC41YzAuMjYsMCwwLjQ4LDAuMTEsMC43MSwwLjM3bDAuNDYtMC42CgkJQzkuMzksNi4yLDguOTMsNi4wMyw4LjQ0LDYuMDNjLTAuOCwwLTEuNDEsMC41NS0xLjQxLDEuMjljMCwwLjYyLDAuMjgsMC45NCwxLjExLDEuMjRjMC4zNSwwLjEyLDAuNTIsMC4yLDAuNjEsMC4yNgoJCUM4LjkyLDguOTQsOSw5LjEsOSw5LjI5YzAsMC4zNy0wLjI5LDAuNjQtMC42OSwwLjY0Yy0wLjQyLDAtMC43Ni0wLjIxLTAuOTYtMC42MUw2Ljc4LDkuODdjMC40MSwwLjYsMC44OSwwLjg2LDEuNTYsMC44NwoJCWMwLjkyLDAsMS41Ni0wLjYxLDEuNTYtMS40OEM5LjkxLDguNTMsOS42Miw4LjIxLDguNjIsNy44NCIvPgoJPHBhdGggY2xhc3M9InN0MiIgZD0iTTEwLjE5LDguMzdjMCwxLjMzLDEuMDQsMi4zNiwyLjM4LDIuMzdjMC4zOCwwLDAuNy0wLjA3LDEuMTEtMC4yNmwwLTEuMDRjLTAuMzUsMC4zNS0wLjY3LDAuNDktMS4wNywwLjQ5CgkJYy0wLjg5LDAtMS41Mi0wLjY1LTEuNTItMS41NmMwLTAuODcsMC42NS0xLjU1LDEuNDgtMS41NWMwLjQyLDAsMC43NCwwLjE1LDEuMTEsMC41MWwwLTEuMDRjLTAuMzktMC4yLTAuNzEtMC4yOC0xLjA5LTAuMjgKCQlDMTEuMjcsNi4wMSwxMC4yLDcuMDYsMTAuMTksOC4zNyIvPgoJPHBvbHlnb24gY2xhc3M9InN0MiIgcG9pbnRzPSIyMC42OCw5LjE3IDE5LjQ5LDYuMTMgMTguNTIsNi4xMyAyMC40MywxMC43NyAyMC45LDEwLjc3IDIyLjg3LDYuMTQgMjEuOTEsNi4xNCAJIi8+Cgk8cG9seWdvbiBjbGFzcz0ic3QyIiBwb2ludHM9IjIzLjI2LDEwLjY2IDI1Ljc2LDEwLjY3IDI1Ljc2LDkuOSAyNC4xNCw5LjkgMjQuMTUsOC42OCAyNS43MSw4LjY4IDI1LjcxLDcuOTIgMjQuMTUsNy45MSAKCQkyNC4xNSw2LjkxIDI1Ljc3LDYuOTEgMjUuNzcsNi4xNSAyMy4yNyw2LjE0IAkiLz4KCTxwYXRoIGNsYXNzPSJzdDIiIGQ9Ik0yOS4yNiw3LjQ5YzAtMC44NS0wLjU4LTEuMzQtMS42LTEuMzRsLTEuMzEsMGwtMC4wMSw0LjUybDAuODgsMGwwLTEuODJsMC4xMSwwbDEuMjIsMS44MmwxLjA5LDBsLTEuNDItMS45MQoJCUMyOC45LDguNjQsMjkuMjYsOC4xOCwyOS4yNiw3LjQ5IE0yNy40OSw4LjIzbC0wLjI2LDBsMC0xLjM3bDAuMjcsMGMwLjU1LDAsMC44NSwwLjIzLDAuODUsMC42N0MyOC4zNSw3Ljk5LDI4LjA2LDguMjMsMjcuNDksOC4yMwoJCSIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTE4Ljc4LDguMzljMCwxLjMzLTEuMDgsMi40LTIuNDEsMi40Yy0xLjMzLDAtMi40LTEuMDgtMi40LTIuNDFjMC0xLjMzLDEuMDgtMi40LDIuNDEtMi40CgkJQzE3LjcxLDUuOTgsMTguNzgsNy4wNiwxOC43OCw4LjM5Ii8+Cgk8cGF0aCBjbGFzcz0ic3QzIiBkPSJNMjkuNzQsNi4yNWMwLTAuMDgtMC4wNS0wLjEyLTAuMTUtMC4xMmwtMC4xMywwbDAsMC40bDAuMSwwbDAtMC4xNWwwLjExLDAuMTVsMC4xMiwwbC0wLjEzLTAuMTYKCQlDMjkuNzEsNi4zNCwyOS43NCw2LjMsMjkuNzQsNi4yNSBNMjkuNTcsNi4zbC0wLjAyLDBsMC0wLjFsMC4wMiwwYzAuMDUsMCwwLjA3LDAuMDIsMC4wNywwLjA1QzI5LjY0LDYuMjgsMjkuNjIsNi4zLDI5LjU3LDYuMyIvPgoJPHBhdGggY2xhc3M9InN0MyIgZD0iTTI5LjYxLDUuOTdjLTAuMTksMC0wLjM1LDAuMTUtMC4zNSwwLjM1YzAsMC4xOSwwLjE1LDAuMzUsMC4zNSwwLjM1YzAuMTksMCwwLjM0LTAuMTYsMC4zNC0wLjM1CgkJQzI5Ljk1LDYuMTMsMjkuOCw1Ljk3LDI5LjYxLDUuOTcgTTI5LjYsNi42MWMtMC4xNSwwLTAuMjgtMC4xMy0wLjI4LTAuMjhjMC0wLjE2LDAuMTItMC4yOCwwLjI4LTAuMjhjMC4xNSwwLDAuMjcsMC4xMywwLjI3LDAuMjkKCQlDMjkuODgsNi40OCwyOS43Niw2LjYxLDI5LjYsNi42MSIvPgo8L2c+Cjwvc3ZnPgo="
+                                               class="discover mr-1">
+                    </div>
+                </div>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                <mc-sonic id="mc-sonic" sonicCue="checkout"></mc-sonic>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <footer id="srcSonicFooter">
+                    <hr />
+                    <div class="container-fluid footer-wrapper p-lg-0">
+
+                </footer>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<table id="src">
+    <!-- Main Header Start Here -->
+    <nav class="mc-oba-header extra-padding">
+        <div class="mc-oba-header-left">
+            <img src="/assets/images/mc_symbol_opt_73_3x.png" alt="Mastercard" class="mc-oba-logo" />
+            <a href="https://developer.mastercard.com/mastercard-checkout-solutions/documentation/use-cases/click-to-pay/"
+               class="mc-oba-developers-link" target="_blank">
+                developers<i class="fa-solid fa-arrow-up-right-from-square"></i>
+
+            </a>
+        </div>
+        <div class="mc-oba-header-center">
+            <span class="mc-oba-header-app">REFERENCE APP</span>
+            <span class="mc-oba-header-title">MCS - Click to Pay : (3rd Party SRC Integration) </span>
+        </div>
+        <div class="mc-oba-header-right">
+            <a href="https://developer.mastercard.com/mastercard-checkout-solutions/documentation/api-reference/apis/"
+               class="mc-oba-github-link" target="_blank">
+                API Reference
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
+        </div>
+    </nav>
+    <tr>
+        <td colspan="2">
+            <button type="button" id="config" name="config" class="collapsible">Configuration</button>
+            <div class="content" id="content" style="display:block">
+                <table border="1" class="Configuration-table">
+                    <thead>
+                    <tr>
+                        <th colspan="3">SRC Configuration Form</th>
+                    </tr>
+                    </thead>
+                    <tr>
+                        <td class="src-main-table-td">
+                            <table class="src-sub-table">
+                                <thead>
+                                <tr class="visually-hidden">
+                                    <th>Label</th>
+                                    <th>Input</th>
+                                </tr>
+                                </thead>
+                                <tr>
+                                    <td class="src-sub-table-td">SRC Client ID:&nbsp;<span
+                                            style="color:red">*</span></td>
+                                    <td><input type="text" name="clientid" id="clientid" value="" size="35" /></td>
+                                </tr>
+                                <tr>
+                                    <td class="src-sub-table-td">SRC DPA ID:&nbsp;<span style="color:red">*</span>
+                                    </td>
+                                    <td><input type="text" name="dpaid" id="dpaid" value="" size="35" /></td>
+                                </tr>
+                                <tr>
+                                    <td class="src-sub-table-td">SRC Tranaction ID:&nbsp;<span
+                                            style="color:red">*</span></td>
+                                    <td><input type="text" name="transactionid" id="transactionid" value=""
+                                               size="35" /></td>
+                                </tr>
+                                <tr>
+                                    <td class="src-sub-table-td">DPA Locale:&nbsp;<span style="color:red">*</span>
+                                    </td>
+                                    <td><input type="text" name="dpalocale" id="dpalocale" value="" size="10" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Transaction Amount/Currency:&nbsp;<span style="color:red">*</span></td>
+                                    <td>
+                                        <input type="text" name="txnAmount" id="txnAmount" value="110"
+                                               size="5" />&nbsp;/&nbsp;
+                                        <input type="text" name="txnCurrency" id="txnCurrency" placeholder="USD"
+                                               value="USD" size="4" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="src-sub-table-td">SRC Signing Consumer Key:</td>
+                                    <td><input type="text" name="consumerkey" id="consumerkey" value="" size="35" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="src-sub-table-td">Type of crytogram:</td>
+                                    <td><input type="radio" id="dsrp" name="cryptogram"
+                                               value="CARD_APPLICATION_CRYPTOGRAM_SHORT_FORM" checked>
+                                        <label for="dsrp">DSRP</label>
+                                        <input type="radio" id="dtvc" name="cryptogram"
+                                               value="DYNAMIC_CARD_SECURITY_CODE">
+                                        <label for="dtvc">DTVC</label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="src-sub-table-td">Payload Type Indicator Checkout:</td>
+                                    <td><input type="radio" id="summary" name="IndicatorCheckout" value="SUMMARY"
+                                               checked>
+                                        <label for="summary">SUMMARY</label>
+                                        <input type="radio" id="full" name="IndicatorCheckout" value="FULL">
+                                        <label for="full">FULL</label>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="border-left:2px dotted #e87600"></td>
+                        <td>
+                            <table class="toggle-table">
+                                <thead>
+                                <tr class="visually-hidden">
+                                    <th>Label</th>
+                                    <th>Input</th>
+                                </tr>
+                                </thead>
+                                <tr>
+                                    <td colspan="2">
+                                        <label class="toggle">
+                                            <input class="toggle-checkbox" type="checkbox" id="shipping"
+                                                   name="shipping">
+                                            <div class="toggle-switch"></div>
+                                            <span class="toggle-label">Allow Shipping Address</span>
+                                        </label>
+                                        <label class="toggle">
+                                            <input class="toggle-checkbox" type="checkbox" id="billing"
+                                                   name="billing">
+                                            <div class="toggle-switch"></div>
+                                            <span class="toggle-label">Allow Billing Address</span>
+                                        </label>
+                                        <label class="toggle">
+                                            <input class="toggle-checkbox" type="checkbox" id="confirmPayment"
+                                                   name="confirmPayment">
+                                            <div class="toggle-switch"></div>
+                                            <span class="toggle-label">Confirm Payment</span>
+                                        </label>
+                                        <label class="toggle">
+                                            <input class="toggle-checkbox" type="checkbox" id="suppressDCF"
+                                                   name="suppressDCF">
+                                            <div class="toggle-switch"></div>
+                                            <span class="toggle-label">Suppress DCF</span>
+                                        </label>
+                                        <label class="toggle">
+                                            <input class="toggle-checkbox" type="checkbox" id="inlineDCF"
+                                                   name="inlineDCF">
+                                            <div class="toggle-switch"></div>
+                                            <span class="toggle-label">Inline DCF (iFrame)</span>
+                                        </label>
+                                        <label class="toggle" style="display: none;">
+                                            <input class="toggle-checkbox" type="checkbox" id="authenticationType"
+                                                   name="authenticationType">
+                                            <div class="toggle-switch"></div>
+                                            <span class="toggle-label">Managed Authentication - FIDO -
+                                                    INPROGRESS</span>
+                                        </label>
+                                        <label class="toggle">
+                                            <input class="toggle-checkbox" type="checkbox" id="tasAuth"
+                                                   name="tasAuth">
+                                            <div class="toggle-switch"></div>
+                                            <span class="toggle-label">TAS</span>
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <hr>
+                                    </td>
+                                </tr>
+                                <tr style="display: none;">
+                                    <td class="table-width-fifty-percent">
+                                        SRC Signing Private Key (In PKCS1 RSA PEM Format):<br />
+                                        <p class="openssl-text">openssl pkcs12 -in key.p12 | openssl rsa -out
+                                            key.key</p>
+                                        <textarea id="privatekey" name="privatekey" rows="10" cols="2"></textarea>
+                                    </td>
+                                    <td>
+                                        SRC Encrypition Key - To Decrypt Payload (In PEM Format):<br />
+                                        <p class="openssl-text">openssl pkcs12 -in enc.p12 | openssl rsa -out
+                                            enc.key</p>
+                                        Note: Please see decrypted payload in the browser Console Log.</br />
+                                        <textarea id="encprivatekey" name="encprivatekey" rows="10"
+                                                  cols="2"></textarea>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2" style="text-align:center;">
+            <button id="customInput" name="customInput" class="glow-on-hover" type="button"
+                    style="display: none;">Client Side Custom
+                JSON</button>&nbsp;
+            <button class="glow-on-hover" type="button" onClick="init()">Initialize SDK</button>&nbsp;
+            <button onClick="isRecognized()" class="glow-on-hover" type="button">Is Recognized?</button>
+        </td>
+    </tr>
+    <tr>
+        <th id="mc-new-card" colspan="2">Mastercard Checkout Services - New User - New Card Flow</th>
+    </tr>
+    <tr>
+        <td class="open-tab-table" colspan="2">
+
+            <div class="tab">
+                <button class="tablinks activetab" onclick="openTab(event, 'cardObject')">Card Detail</button>
+                <button class="tablinks" onclick="openTab(event, 'billingAddress')">Card Billing Address</button>
+                <button class="tablinks" onclick="openTab(event, 'consumerObject')">Consumer Object</button>
+            </div>
+
+            <div id="cardObject" class="tabcontent" style="display:block">
+                <table class="table-width-hundred-percent">
+                    <thead>
+                    <tr class="visually-hidden">
+                        <th>Label</th>
+                        <th>Input</th>
+                    </tr>
+                    </thead>
+                    <tr>
+                        <td>Card:<span style="color:red">*</span></td>
+                        <td>
+                            <input name="oldcardnumber" id="oldcardnumber" type="text" class="ccFormatMonitor"
+                                   placeholder="Card Number" onchange='EncryptCard("old")'>
+                            <input type="text" id="oldinputExpDate" placeholder="MM / YYYY" class="expdate"
+                                   maxlength='9' onchange='EncryptCard("old")' size="9">
+                            <input name="oldcvvnumber" id="oldcvvnumber" type="password" class="cvv"
+                                   placeholder="CVV" maxlength='4' size="7" onchange='EncryptCard("old")'>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Card Holder :</td>
+                        <td>
+                            <input type="text" name="oldcardholdername" id="oldcardholdername" style="width:210px"
+                                   onchange='EncryptCard("old")' />
+                        </td>
+                    </tr>
+                    <tr id="trRememberMe1" name="trRememberMe1" style="display:none">
+                        <td colspan="2">
+                            <label class="toggle">
+                                <span class="toggle-label">Remember Me in this Browser</span>
+                                <input class="toggle-checkbox" type="checkbox" id="rememberMe1" name="rememberMe1">
+                                <div class="toggle-switch"></div>
+                            </label>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="billingAddress" class="tabcontent">
+                <div id="billingAdd" name="billingAdd">
+                    <table class="table-width-hundred-percent">
+                        <thead>
+                        <tr class="visually-hidden">
+                            <th>Label</th>
+                            <th>Input</th>
+                        </tr>
+                        </thead>
+                        <tr>
+                            <td>Name:<span style="color:red">*</span></td>
+                            <td><input type="text" name="billingAddName" id="billingAddName" value=""
+                                       onchange='EncryptCard("old")' /> </td>
+                            <td>Address Line 1:<span style="color:red">*</span></td>
+                            <td><input type="text" name="billingAddLine1" id="billingAddLine1" value=""
+                                       onchange='EncryptCard("old")' /></td>
+                        </tr>
+                        <tr>
+                            <td>Address Line 2:</td>
+                            <td><input type="text" name="billingAddLine2" id="billingAddLine2" value=""
+                                       onchange='EncryptCard("old")' /> </td>
+                            <td>Address Line 3:</td>
+                            <td><input type="text" name="billingAddLine3" id="billingAddLine3" value=""
+                                       onchange='EncryptCard("old")' /></td>
+                        </tr>
+                        <tr>
+                            <td>City:<span style="color:red">*</span></td>
+                            <td><input type="text" name="billingAddCity" id="billingAddCity" value=""
+                                       onchange='EncryptCard("old")' /> </td>
+                            <td>State:</td>
+                            <td><input type="text" name="billingAddState" id="billingAddState" value=""
+                                       onchange='EncryptCard("old")' /></td>
+                        </tr>
+                        <tr>
+                            <td>ZipCode:<span style="color:red">*</span></td>
+                            <td><input type="text" name="billingAddZip" id="billingAddZip" value=""
+                                       onchange='EncryptCard("old")' /> </td>
+                            <td>Country Code:<span style="color:red">*</span></td>
+                            <td><input type="text" name="billingCountryCode" id="billingCountryCode"
+                                       placeholder="US" value="" onchange='EncryptCard("old")' /> </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div id="consumerObject" class="tabcontent">
+                <table class="table-width-hundred-percent">
+                    <thead>
+                    <tr class="visually-hidden">
+                        <th>Label</th>
+                        <th>Input</th>
+                    </tr>
+                    </thead>
+                    <tr>
+                        <td>First Name:</td>
+                        <td><input type="text" name="oldcardholderfname" id="oldcardholderfname" value="" /></td>
+                    </tr>
+                    <tr>
+                        <td>Last Name:</td>
+                        <td><input type="text" name="oldcardholderlname" id="oldcardholderlname" value="" /></td>
+                    </tr>
+                    <tr>
+                        <td>Email:</td>
+                        <td><input type="text" name="consumerEmail" id="consumerEmail" value="" /></td>
+                    </tr>
+                    <tr>
+                        <td>Mobile Number (Country Code):</td>
+                        <td><input type="text" name="consumerMobileCountryCode" id="consumerMobileCountryCode"
+                                   value="" maxlength="3" size="3" />&nbsp;-&nbsp;
+                            <input type="text" name="consumerMobileNumber" id="consumerMobileNumber" value="" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <p><span id="plaintext"></span></p>
+            <p>Encrypted Card: <input type="text" name="ciphertext" id="ciphertext" value="" style="width:100%" />
+            </p><br />
+
+            <button class="hide-btn" onClick='EncryptCard("old")'>
+                <a href="#" style="display:none">
+                    Encrypt Card
+                </a>
+            </button>
+            <br />
+            <button class="hide-btn" onClick="Checkout()">
+                <a href="#">
+                    <img alt="mastercard-src-chk-btn" style="width:200px"
+                         src="https://src.mastercard.com/assets/img/btn/src_chk_btn_126x030px.svg?locale=en_us&amp;paymentmethod=master">
+                </a>
+            </button>
+
+        </td>
+    </tr>
+    <tr>
+        <th id="mc-new-card-checkout" colspan="2">Mastercard Checkout Services - Return User - Existing Card Checkout / Add a
+            New Card
+
+        </th>
+    </tr>
+    <tr>
+        <td style="vertical-align:top" colspan="2">
+            <div class="tab1">
+                <button class="tablinks1 activetab" name="idL" id="idL"
+                        onclick="openTab1(event, 'idLookup')">Identity Lookup</button>
+                <button class="tablinks1" name="iiV" id="iiV"
+                        onclick="openTab1(event, 'initiateValidation')">Initiate Identity Validation</button>
+                <button class="tablinks1" name="vOTP" id="vOTP" onclick="openTab1(event, 'validateOTP')">Validate
+                    OTP</button>
+                <button class="tablinks1" name="aNewCard" id="aNewCard" onclick="openTab1(event, 'addNewCard')">Add
+                    New Card</button>
+            </div>
+            <div id="idLookup" class="tabcontent1" style="display:block">
+                <p>
+                    Email: <input type="text" name="email" id="email" style="width:30%" />&nbsp;&nbsp;
+                    <button class="hide-btn" onClick="IdentityLookup()">
+                        <a href="#">Identity Lookup</a>
+                    </button>
+                </p>
+            </div>
+            <div id="initiateValidation" class="tabcontent1">
+                <p>
+                    <label for="cars">Validation Channels:</label><br />
+                    <input type="radio" id="email" name="identityV" value="email" checked>
+                    <label for="email">Email</label><br>
+                    <input type="radio" id="phone" name="identityV" value="phone">
+                    <label for="phone">Phone</label><br /><br />
+                    <button class="hide-btn" id="initiateIdentityValidation" onClick="InitiateIdentityValidation()">
+                        <a href="#">Initiate Identity Validation</a>
+                    </button>
+
+                </p>
+            </div>
+            <div id="validateOTP" class="tabcontent1">
+                <p>
+                    OTP: <input type="text" name="otp" id="otp" value="" />&nbsp;&nbsp;
+                    <button class="hide-btn" onClick="CompleteIdentityValidation()">
+                        <a href="#">
+                            Complete Identity Validation
+                        </a>
+                    </button>
+                    <br />
+                <div id="trRememberMe2" name="trRememberMe2" style="display:none">
+                    <label class="toggle">
+                        <input class="toggle-checkbox" type="checkbox" id="rememberMe2" name="rememberMe2">
+                        <div class="toggle-switch"></div>
+                        <span class="toggle-label">Remember Me in this Browser</span>
+                    </label>
+                </div>
+                </p>
+            </div>
+            <div id="addNewCard" class="tabcontent1">
+                <table class="table-width-hundred-percent">
+                    <thead>
+                    <tr class="visually-hidden">
+                        <th>Label</th>
+                        <th>Input</th>
+                    </tr>
+                    </thead>
+                    <tr>
+                        <td>Card:<span style="color:red">*</span></td>
+                        <td>
+                            <input name="cardnumber" id="cardnumber" type="text" class="ccFormatMonitor"
+                                   placeholder="Card Number" onchange='EncryptCard("new")'>
+                            <input type="text" id="newinputExpDate" placeholder="MM / YYYY" class="expdate"
+                                   maxlength='9' onchange='EncryptCard("new")' size="9">
+                            <input name="cvvnumber" id="cvvnumber" type="password" class="cvv" placeholder="CVV"
+                                   maxlength='4' size="7" onchange='EncryptCard("new")'>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Card Holder :</td>
+                        <td>
+                            <input type="text" name="cardholdername" id="cardholdername" style="width:210px"
+                                   onchange='EncryptCard("new")' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>
+                            <span id="newplaintext"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Encrypted Card :</td>
+                        <td>
+                            <input type="text" name="newciphertext" id="newciphertext" style="width:100%" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="table-width-hundred-percent">
+                            <button class="hide-btn" onClick='EncryptCard("new")'>
+                                <a href="#" style="display:none;">
+                                    Encrypt Card
+                                </a>
+                            </button>
+                            <br />
+                            <button class="hide-btn" onClick='EnrollCard()'>
+                                <a href="#">
+                                    Enroll Card
+                                </a>
+                            </button>
+
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <br /><br />
+            <button class="hide-btn" onClick="GetSRCProfile()">
+                <a href="#">
+                    Get SRC Profile
+                </a>
+            </button>
+            <br /><br />
+            <label for="cars">Choose a card:</label>
+            <select name="cards" id="cards">
+                <option value="" selected>Select</option>
+            </select>&nbsp;
+            <button class="hide-btn" onClick='DeleteCard()'>
+                <a id="deleteCard" style="display:none" target="_blank" class="not-your-cards">
+                    Delete Card
+                </a>
+            </button>
+            &nbsp;
+            <button class="hide-btn" onClick="SignOut(', listed cards are not yours?')">
+                <a id="notYourCards" style="display:none" target="_blank" class="not-your-cards">
+                    Not Your Cards?
+                </a>
+            </button>
+            <br /><br />
+            <button class="hide-btn" onClick="ReturnUserCheckout()">
+                <a href="#">
+                    <img alt="payment-method" style="width:200px"
+                         src="https://src.mastercard.com/assets/img/btn/src_chk_btn_126x030px.svg?locale=en_us&amp;paymentmethod=master">
+                </a>
+            </button>
+
+        </td>
+    </tr>
+</table>
+<div class="iframe-container slide-in" id="iframeContainer">
+    <div class="iframe-foreground">
+        <iframe title="iframe-checkout-title" class="iframe-checkout" id="checkoutIframe"
+                name="checkout-iframe"></iframe>
+    </div>
+    <div class="iframe-background" id="iframeBackground" />
+</div>
+<footer id="srcFooter">
+    <hr />
+    <div class="container-fluid footer-wrapper p-lg-0">
+        <div class="row text-center">
+        </div>
+</footer>
+</div>
+<script src="/assets/js/cardUI.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>MCS Click To Pay - Checkout API </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8" />
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/fontawesome/css/all.min.css" />
+
+    <script src="/assets/js/jquery.min.js"></script>
+    <script src="/assets/js/jquery.validate.min.js"></script>
+
+    <script src="/assets/js/environment.js"></script>
+
+    <script src="/assets/js/checkout.js"></script>
+    <script src="/assets/js/common.js"></script>
+    <link rel="icon" type="image/svg" href="/assets/images/favicon.svg">
+
+
+    <!-- Font Awesome CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container-fluid p-0">
+        <!-- Main Header Start Here -->
+        <nav class="mc-oba-header">
+            <div class="mc-oba-header-left">
+                <img src="/assets/images/mc_symbol_opt_73_3x.png" alt="Mastercard" class="mc-oba-logo" />
+                <a href="https://developer.mastercard.com/mastercard-checkout-solutions/documentation/use-cases/click-to-pay/"
+                    class="mc-oba-developers-link" target="_blank">
+                    developers<i class="fa-solid fa-arrow-up-right-from-square"></i>
+
+                </a>
+            </div>
+            <div class="mc-oba-header-center">
+                <span class="mc-oba-header-app">REFERENCE APP</span>
+                <span class="mc-oba-header-title">MCS - Click to Pay</span>
+            </div>
+            <div class="mc-oba-header-right">
+                <a href="https://developer.mastercard.com/mastercard-checkout-solutions/documentation/api-reference/apis/"
+                    class="mc-oba-github-link" target="_blank">
+                    API Reference
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Header End Here -->
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mt-0 mb-0 api-form-box">
+            <!-- API Name Header Start Here -->
+            <div class="row mb-3 api-name-border pb-3">
+                <div class="col-xl-1 col-lg-1 col-md-1 col-sm-1 col-2 d-flex align-items-center">
+                    <a href="/" class="text-decoration-none">
+                        <img class="back-logo" src="/assets/images/back_icon@2x.png" alt="Back Logo" />
+                    </a>
+                </div>
+                <div
+                    class="col-xl-11 col-lg-11 col-md-11 col-sm-11 col-10 d-flex align-items-center justify-content-center p-0">
+                    <span class="api-name-label"> MCS Click To Pay - Checkout API </span>
+                </div>
+            </div>
+            <!-- API Name Header End Here -->
+
+
+            <div class="container-fluid p-0 pt-4 pb-0">
+                <h2 class="mc-page-title">Click To Pay Checkout</h2>
+                <div class="mc-page-subtitle">Perform Click to Pay Checkout</div>
+
+                <span class="mb-3 styled-line"></span>
+            </div>
+            <div class="content">
+                <!-- Standalone API Prerequisite Note START -->
+                <div class="alert alert-warning mb-4"
+                    style="font-size: 1rem; border-left: 6px solid #f6a800; background: #fffbe5;">
+                    <b>Important:</b> This Checkout API call is <u>not an independent step</u>.<br>
+                    <ul style="margin-bottom: 0; margin-top: 0.5em;">
+                        <li>
+                            Before using this standalone API, go to the <b>main dashboard</b> of the Reference App and
+                            click on <b>“Go to SDK Demo”</b> under <b>Click to Pay SDK Integration</b>.
+                        </li>
+                        <li>
+                            <b>Step 1:</b> Perform the <code>init()</code> call to initialize the SDK.
+                        </li>
+                        <li>
+                            <b>Step 2:</b> Choose your flow:<br>
+                            &nbsp;&nbsp;&mdash; <b>New user:</b> Fill out all required details (card information,
+                            billing address, and personal info), then perform checkout.<br>
+                            &nbsp;&nbsp;&mdash; <b>Returning user:</b> Complete <b>identity verification</b> (via email
+                            or SMS).
+                        </li>
+                        <li>
+                            After completing the flow above and reaching the final checkout step, select <b>“No, will
+                                run perform standalone API call”</b> when prompted.
+                        </li>
+                        <li>
+                            <b>Copy the required credentials</b> (visible in the logs below the SDK demo) and use them
+                            in this Checkout API form.
+                        </li>
+                    </ul>
+                    <span style="color:#b65a00;">
+                        <b>Note:</b> The SDK demo must be run first to get valid credentials.
+                        If you skip these steps, this API call will not work with dummy values.
+                    </span>
+                </div>
+                <!-- Standalone API Prerequisite Note END -->
+
+                <form id="checkout-form">
+                    <input type="hidden" id="actionMode" value="ADD" />
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="xSrcCxFlowId">X-Src-Cx-Flow-Id:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:<br>Header</b><br>Optional. The X-Src-Cx-Flow-Id ensures to direct all calls from the same client to the same server and maintains session affinity. When you make your initial API call, Secure Card on File responds with the X-Src-Cx-Flow-Id in the header. The X-Src-Cx-Flow-Id returned in this response can be used in the subsequent calls to ensure these calls are directed to the same server that returned the initial response.<br><br>Example: 34f4a04b.7602af12-a18b-4023-a476-8231ddcaefe7.1621276711<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="xSrcCxFlowId" name="xSrcCxFlowId" class="form-control" value="">
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="xSrcResponseHost">X-Src-Response-Host:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:<br>Header</b><br>Optional. The X-Src-Response-Host is used to direct all calls from the same client to the same server to maintain session affinity. When you make your initial API call, Mastercard Checkout Solutions responds with the X-Src-Response-Host in the HTTP header. The X-Src-Response-Host that is returned will contain a site specific URL that must be used in the subsequent calls to ensure these calls are directed to the same server that returned the initial response.<br><br>Example: https://ksc.services-asn.mastercard.com/<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="xSrcResponseHost" name="xSrcResponseHost" class="form-control"
+                                value="">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="srcClientId">SRC Client Id:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Required. pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$ A unique identifier assigned by Mastercard during onboarding which signifies the responsible party Integrating to Mastercard Checkout Solutions (MCS).<br><br>Required: True<br><br>Example: eccbf087-f159-4d69-b31d-00bec75c0474<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="srcClientId" name="srcClientId" class="form-control" value=""
+                                required>
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="srcDpaId">SRC DPA Id:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Required. The registered identifier for the Digital Payment Application (DPA) accessing the service. Conditional: Required if you are a Merchant directly integrating with Mastercard Checkout Solutions (MCS) APIs, a Payment Service Provider (PSP) integrating On-Behalf-Of (OBO) a Merchant, a Payment Facilitator, or if you are enrolling in the Secure Card on File (SCOF) QR program.<br><br>Required: True<br><br>Example: 297b379a-663c-4e31-a019-b3a48701b8ae<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="srcDpaId" name="srcDpaId" class="form-control" value="" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="srcCorrelationId">SRC Correlation Id:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Required. pattern: ^([0-9a-f]{8}.)?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$ A unique identifier that correlates a series of two or more requests to a single session of activity. Mastercard Checkout Solutions (MCS) will return a new srcCorrelationId in each response by default, but Integrators may choose to populate previously used srcCorrelationIds in subsequent requests to correlate their activity under a single ID. This can be done by providing a Mastercard generated srcCorrelationId in the request, or by generating your own ID in the same format. SrcCorrelationId is used for tracking and troubleshooting purposes within Mastercard's ecosystem.<br><br>Required: True<br><br>Example: 779165e0-1905-4edd-89fa-be46497b5044<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="srcCorrelationId" name="srcCorrelationId" class="form-control"
+                                value="4f339be7.620d8dab-2ae6-4c19-9e2a-316a58c57016" required>
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="srcDigitalCardId">SRC Digital Card Id:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Required. A unique identifier that represents the token associated with a card enrolled into Mastercard Checkout Solutions (MCS). Use this srcDigitalCardId in subsequent checkout requests to retrieve a DSRP payload containing the associated token and cryptogram for payment authorization. Alternatively, use the srcDigitalCardId in a get card request to retrieve the maskedCard details.<br><br>Required: True<br><br>Example: 61XJzB_BQ9qa29nGa7JZrQ000000000000US<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="srcDigitalCardId" name="srcDigitalCardId" class="form-control"
+                                value="kX80JVX0Rw6DBv5Q1oFakg000000000000US" required>
+                        </div>
+                    </div>
+
+                    <h3 class="">Shipping Address Details</h3>
+                    <span class="mb-3 styled-line"></span>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="shippingLine1">Line 1:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. First line of address. Conditional - Required for Token authentication framework when address is available<br><br>Max Length: 75<br><br>Example: 100 Avenue Lane Street<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="shippingLine1" name="shippingLine1" class="form-control" value="">
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="shippingCity">City:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. City of the address.<br><br>Max Length: 50<br><br>Example: Metropolis<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="shippingCity" name="shippingCity" class="form-control" value="">
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="shippingState">State:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. State of the address.<br><br>Max Length: 30<br><br>Example: MH<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="shippingState" name="shippingState" class="form-control" value="">
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="shippingCountryCode">Country Code:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. ISO 3166 alpha 2 country code where the address is located. Conditional - Required for Token authentication framework when address is available.<br><br>Max Length: 2<br><br>Example: US<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="shippingCountryCode" name="shippingCountryCode" class="form-control"
+                                value="">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="shippingZip">Zip:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. Postal code of the address. Conditional - Required for Token authentication framework when address is available.<br><br>Max Length: 16<br><br>Example: 41321<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="shippingZip" name="shippingZip" class="form-control" value="">
+                        </div>
+                    </div>
+
+
+                    <h3 class="">Billing Address Details</h3>
+                    <span class="mb-3 styled-line"></span>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="billingLine1">Line 1:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. First line of address. Conditional - Required for Token authentication framework when address is available<br><br>Max Length: 75<br><br>Example: 100 Avenue Lane Street<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="billingLine1" name="billingLine1" class="form-control" value="">
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="billingCity">City:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. City of the address.<br><br>Max Length: 50<br><br>Example: Metropolis<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="billingCity" name="billingCity" class="form-control" value="">
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="billingState">State:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. State of the address.<br><br>Max Length: 30<br><br>Example: MH<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="billingState" name="billingState" class="form-control" value="">
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="billingCountryCode">Country Code:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. ISO 3166 alpha 2 country code where the address is located. Conditional - Required for Token authentication framework when address is available.<br><br>Max Length: 2<br><br>Example: US<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="billingCountryCode" name="billingCountryCode" class="form-control"
+                                value="">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="billingZip">Zip:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. Postal code of the address. Conditional - Required for Token authentication framework when address is available.<br><br>Max Length: 16<br><br>Example: 41321<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="billingZip" name="billingZip" class="form-control" value="">
+                        </div>
+                    </div>
+
+
+                    <h3 class="">Digital Transaction Data</h3>
+                    <span class="mb-3 styled-line"></span>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="emailAddressFormat">Email Address Format:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. This parameter indicates if an email address is clear or hashed email address collected during checkout. Required when the email address is provided. Possible values are: '0' - Clear / Plain email address '1' - Hashed email addres.<br><br>Max Length: 1<br><br>Example: 1<br><br>Type: Number">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="number" id="emailAddressFormat" name="emailAddressFormat" class="form-control"
+                                value="">
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="emailAddress">Email Address:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. CardHolder's email Address. In case of hashed email address use SHA256 Algorithm. Refer to Appendix B TAF Program Guide for more details. Conditional : Required for Token Authentication Framework. Mandatory if no phone number is provided.<br><br>Max Length: 320<br><br>Example: johndoe@mail.com<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="emailAddress" name="emailAddress" class="form-control" value="">
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="deviceLocation">Device Location:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. This field should contain the latitude and longitude coordinates of the device where consumer is attempting to checkout. It's formatted as first 8 digits are latitude & longitude hexadecimal encoded degree with two decimal places and last digit is latitude & longitude sector value from one of the values (1:NW 2:NE 3SW 4SE). Conditional : Required for Token Authentication Framework unless the consumer has declined to share his/her location.<br><br>Max Length: 9<br><br>Example: 777788883<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="deviceLocation" name="deviceLocation" class="form-control" value="">
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="ipAddress">IP Address:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. Unique string of characters that identifies a device. Support V4 or V6 Conditional : Required for Token Authentication Framework.<br><br>Max Length: 39<br><br>Example: ***.***.***.***<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="ipAddress" name="ipAddress" class="form-control" value="">
+                        </div>
+
+                    </div>
+
+                    <h3>Contact Details</h3>
+                    <span class="mb-3 styled-line"></span>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="countryCode">Country Code:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Required. Country code for phone numbers, formatted as an international calling code. Input should only contain numbers, without the plus sign.<br><br>Min Length: 1<br><br>Max Length: 4<br><br>Example: 1 (For US)<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="countryCode" name="countryCode" class="form-control" value="">
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="phoneNumber">Phone Number:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Required. Phone number without country code.<br><br>Example: 1234567890<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="phoneNumber" name="phoneNumber" class="form-control" value="">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn submit-btn">Submit</button>
+                    <span class="mb-3 mt-5 styled-line"></span>
+                </form>
+
+                <div class="api-object-card mt-4" style="display: none;">
+                    <div class="api-object-header">
+                        <span class="api-object-icon"><i class="fa-solid fa-arrow-right"></i></span>
+                        Request Headers
+                        <button type="button" class="copy-json-btn" data-target="#requestHeadersContent" title="Copy">
+                            <i class="fa fa-copy"></i>
+                        </button>
+                    </div>
+                    <pre class="api-json-block" id="requestHeadersContent"></pre>
+                </div>
+
+                <div class="api-object-card mt-4">
+                    <div class="api-object-header">
+                        <span class="api-object-icon"><i class="fa-solid fa-code"></i></span>
+                        Request Object
+                        <button type="button" class="copy-json-btn" data-target="#requestBodyContent" title="Copy">
+                            <i class="fa fa-copy"></i>
+                        </button>
+                    </div>
+                    <pre class="api-json-block" id="requestBodyContent"></pre>
+                </div>
+
+                <div class="api-object-card mt-4">
+                    <div class="api-object-header">
+                        <span class="api-object-icon"><i class="fa-solid fa-code-branch"></i></span>
+                        Response Object
+                        <button type="button" class="copy-json-btn" data-target="#responseContent" title="Copy">
+                            <i class="fa fa-copy"></i>
+                        </button>
+                    </div>
+                    <pre class="api-json-block" id="responseContent"></pre>
+                </div>
+
+                <div class="api-object-card mt-4">
+                    <div class="api-object-header">
+                        <span class="api-object-icon"><i class="fa-solid fa-server"></i></span>
+                        Response Headers
+                        <button type="button" class="copy-json-btn" data-target="#mastercardResponseHeadersContent"
+                            title="Copy">
+                            <i class="fa fa-copy"></i>
+                        </button>
+                    </div>
+                    <pre class="api-json-block" id="mastercardResponseHeadersContent"></pre>
+                </div>
+            </div>
+        </div>
+        <div id="spinner" class=""></div>
+        <!-- Bootstrap JS and dependencies -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+        <script>
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip();
+            });
+        </script>
+</body>
+
+</html>

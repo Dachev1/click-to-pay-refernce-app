@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>MCS Click to Pay - Modern UI</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/css/click-to-pay-sdk-modern.css" />
+    <link rel="stylesheet" href="/assets/css/modaldcfstyle.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css" />
+    <link rel="stylesheet" href="/assets/css/fontawesome/css/all.min.css" />
+    <link rel="icon" type="image/svg" href="/assets/images/favicon.svg">
+
+</head>
+
+<body>
+<div id="spinner" class=""></div>
+
+<!-- Checkout API Choice Modal START -->
+<div class="modal fade" id="chooseCheckoutApiModal" tabindex="-1" aria-labelledby="chooseCheckoutApiModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 1rem;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="chooseCheckoutApiModalLabel">
+                    Checkout: Choose API Call
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-2 fw-bold text-center">
+                    Do you want to complete checkout using the SDK, or perform the API call as a standalone call?
+                </div>
+                <ul class="mb-3 ps-3">
+                    <li>
+                        <b>Continue in SDK flow</b>: Instantly perform the checkout & confirmation backend API call as part of the
+                        current SDK demo flow.
+                    </li>
+                    <li>
+                        <b>No, will run perform standalone API call</b>: You can copy credentials and
+                        manually run the Checkout/Confirmation API as a separate step.
+                    </li>
+                </ul>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" id="btnUseSdkApi" class="btn btn-primary">
+                    Continue in SDK flow
+                </button>
+                <button type="button" id="btnUseStandaloneApi" class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal">
+                    No, will run perform standalone API call
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Checkout API Choice Modal END -->
+
+
+<div class="modal fade" id="animationStep" tabindex="-1" aria-labelledby="animationStepLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content animation-step-card">
+            <!-- Modal Header -->
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title d-flex align-items-center" id="animationStepLabel">
+                    <span class="me-2 mc-service-text">Mastercard Checkout Services</span>
+                    <img alt="mastercard_icon_1"
+                         src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMzJweCIgaGVpZ2h0PSIyMHB4IiB2aWV3Qm94PSIwIDAgMzIgMjAiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8IS0tIEdlbmVyYXRvcjogU2tldGNoIDU4ICg4NDY2MykgLSBodHRwczovL3NrZXRjaC5jb20gLS0+CiAgICA8dGl0bGU+VUkgTmV0d29ya3MvTWFzdGVyY2FyZDwvdGl0bGU+CiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4KICAgIDxnIGlkPSJQYWdlLTEiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxnIGlkPSJ2M19tYXJrX2RhcmtfU18xNnB4IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtNDIuMDAwMDAwLCAtMS4wMDAwMDApIj4KICAgICAgICAgICAgPGcgaWQ9IlVJLU5ldHdvcmtzL01hc3RlcmNhcmQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQyLjAwMDAwMCwgMS4wMDAwMDApIj4KICAgICAgICAgICAgICAgIDxnIGlkPSJtY19zeW1ib2wiPgogICAgICAgICAgICAgICAgICAgIDxyZWN0IGlkPSJSZWN0YW5nbGUiIGZpbGw9IiNGRjVGMDAiIGZpbGwtcnVsZT0ibm9uemVybyIgeD0iMTEuMzE0ODcxOCIgeT0iMi4yMzAxMzY5OSIgd2lkdGg9IjkuNDc5NjU4MSIgaGVpZ2h0PSIxNS41MDk1ODkxIj48L3JlY3Q+CiAgICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTEyLjI5MTI4Miw5Ljk4NjMwMTM1IEMxMi4yODg5MDE5LDYuOTYwMjc0MzUgMTMuNjc1NjUzNiw0LjEwMTE5OTY1IDE2LjA1MTk2NTgsMi4yMzI4NzY3MSBDMTIuMDE0OTg1NCwtMC45NDUxOTEyOTUgNi4yMTc3MTk2LC0wLjQ4MjI3ODIwNSAyLjczNDMzMTA1LDMuMjk2MjkzMSBDLTAuNzQ5MDU3NTEsNy4wNzQ4NjQ0IC0wLjc0OTA1NzUxLDEyLjkwMDQ3ODEgMi43MzQzMzEwNSwxNi42NzkwNDkzIEM2LjIxNzcxOTYsMjAuNDU3NjIwNiAxMi4wMTQ5ODU0LDIwLjkyMDUzMzggMTYuMDUxOTY1OCwxNy43NDI0NjU4IEMxMy42NzQ4OTc0LDE1Ljg3MzU0OTUgMTIuMjg4MDYwOSwxMy4wMTMyODk4IDEyLjI5MTI4Miw5Ljk4NjMwMTM1IFoiIGlkPSJQYXRoIiBmaWxsPSIjRUIwMDFCIiBmaWxsLXJ1bGU9Im5vbnplcm8iPjwvcGF0aD4KICAgICAgICAgICAgICAgICAgICA8cG9seWdvbiBpZD0iUGF0aCIgZmlsbD0iI0Y3OUUxQiIgZmlsbC1ydWxlPSJub256ZXJvIiBwb2ludHM9IjMwLjg1OTgzMDUgMTYuMjA3MDk2OCAzMC44NTk4MzA1IDE1Ljg3NTI5OTYgMzAuOTk1NDIzOCAxNS44NzUyOTk2IDMwLjk5NTQyMzggMTUuODIgMzAuNjcgMTUuODIgMzAuNjcgMTUuODc1Mjk5NiAzMC44MDU1OTMyIDE1Ljg3NTI5OTYgMzAuODA1NTkzMiAxNi4yMDcwOTY4Ij48L3BvbHlnb24+CiAgICAgICAgICAgICAgICAgICAgPHBvbHlnb24gaWQ9IlBhdGgiIGZpbGw9IiNGNzlFMUIiIGZpbGwtcnVsZT0ibm9uemVybyIgcG9pbnRzPSIzMS40ODM4OTgzIDE1LjgyIDMxLjM3NTQyMzcgMTUuODIgMzEuMjY2OTQ5MSAxNi4wOTY0OTc3IDMxLjE1ODQ3NDYgMTUuODIgMzEuMDUgMTUuODIgMzEuMDUgMTYuMjA3MDk2OCAzMS4xMzEzNTU5IDE2LjIwNzA5NjggMzEuMTMxMzU1OSAxNS45MDI5NDkzIDMxLjIyMTUyNzEgMTYuMTUxNzk3MyAzMS4zMjExODY0IDE2LjE1MTc5NzMgMzEuNDA4NDAxNSAxNS45MDI5NDkzIDMxLjQwODQwMTUgMTYuMjA3MDk2OCAzMS40ODM4OTgzIDE2LjIwNzA5NjgiPjwvcG9seWdvbj4KICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMzEuOTgzNTg5OCw5Ljk4NjMwMTM1IEMzMS45ODM1ODk4LDEzLjc2MjU2OTkgMjkuODMwOTUyOCwxNy4yMDczMDE0IDI2LjQ0MDEzODIsMTguODU3NTA1MiBDMjMuMDQ5MzIzNywyMC41MDc3MDg5IDE5LjAxNTU0NTksMjAuMDczNjY5OCAxNi4wNTE5NjU4LDE3LjczOTcyNjEgQzE4LjQyNzI0MTEsMTUuODY5ODE3IDE5LjgxNDA5NzMsMTMuMDExMTIyNCAxOS44MTQwOTczLDkuOTg0OTMxNSBDMTkuODE0MDk3Myw2Ljk1ODc0MDcgMTguNDI3MjQxMSw0LjEwMDA0NjA3IDE2LjA1MTk2NTgsMi4yMzAxMzY5OSBDMTkuMDE1NTQ1OSwtMC4xMDM4MDY4MDEgMjMuMDQ5MzIzNywtMC41Mzc4NDU4NyAyNi40NDAxMzgyLDEuMTEyMzU3ODQgQzI5LjgzMDk1MjgsMi43NjI1NjE1NSAzMS45ODM1ODk4LDYuMjA3MjkzMDUgMzEuOTgzNTg5OCw5Ljk4MzU2MTY1IEwzMS45ODM1ODk4LDkuOTg2MzAxMzUgWiIgaWQ9IlBhdGgiIGZpbGw9IiNGNzlFMUIiIGZpbGwtcnVsZT0ibm9uemVybyI+PC9wYXRoPgogICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4="
+                         class="mastercard mr-1" />
+                    <img alt="mastercard_icon_2" src="/assets/images/visa.png" class="visa mr-2" />
+                    <img alt="mastercard_icon_3"
+                         src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMjJweCIgaGVpZ2h0PSIyMnB4IiB2aWV3Qm94PSIwIDAgMjIgMjIiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8IS0tIEdlbmVyYXRvcjogU2tldGNoIDU4ICg4NDY2MykgLSBodHRwczovL3NrZXRjaC5jb20gLS0+CiAgICA8dGl0bGU+VUkgTmV0d29ya3MvQU1FWDwvdGl0bGU+CiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4KICAgIDxnIGlkPSJQYWdlLTEiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxnIGlkPSJ2M19tYXJrX2RhcmtfU18xNnB4IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMTIxLjAwMDAwMCwgMC4wMDAwMDApIj4KICAgICAgICAgICAgPGcgaWQ9IlVJLU5ldHdvcmtzL0FNRVgiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyMS4wMDAwMDAsIDAuMDAwMDAwKSI+CiAgICAgICAgICAgICAgICA8ZyBpZD0iQW1leC01MDB4NTAwQDF4Ij4KICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlIiBmaWxsPSIjRkZGRkZGIiBmaWxsLXJ1bGU9Im5vbnplcm8iIHg9IjAiIHk9IjAiIHdpZHRoPSIyMS45NTAxMTM0IiBoZWlnaHQ9IjIxLjk1MDExMzQiPjwvcmVjdD4KICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMCwwIEwwLDIxLjk1MDExMzQgTDIxLjk1MDExMzQsMjEuOTUwMTEzNCBMMjEuOTUwMTEzNCwxOC40NzIwMzAxIEwxOS4zMDIwMDc4LDE4LjQ3MjAzMDEgTDE3LjkzODY0MjQsMTYuOTY0NDk2MyBMMTYuNTY4Mzg0NiwxOC40NzIwMzAxIEw3LjgzNzM3NTc4LDE4LjQ3MjAzMDEgTDcuODM3Mzc1NzgsMTEuNDQ1OTc0NCBMNS4wMTkzNzYzMywxMS40NDU5NzQ0IEw4LjUxNDgwMDE4LDMuNTM1NTA0NzYgTDExLjg4NTgxMDgsMy41MzU1MDQ3NiBMMTMuMDg5MTU5OSw2LjI0NTUwOTY2IEwxMy4wODkxNTk5LDMuNTM1NTA0NzYgTDE3LjI2MTgzMjYsMy41MzU1MDQ3NiBMMTcuOTg2MzE4LDUuNTc3NjExNjEgTDE4LjcxNTU0NDcsMy41MzU1MDQ3NiBMMjEuOTUwMTEzNCwzLjUzNTUwNDc2IEwyMS45NTAxMTM0LDAgTDAsMCBaIE0xOS4zNzAwNTMyLDQuNDE1MjIxNDEgTDE3Ljk5MjI0NDUsOC4yNDEyNTc4NyBMMTYuNjIzMzAzOCw0LjQxNTIyMTQxIEwxMy45OTk0MzExLDQuNDE1MjIxNDEgTDEzLjk5OTQzMTEsMTAuNTU4MDkyMyBMMTUuNjU3OTgxNywxMC41NTgwOTIzIEwxNS42NTc5ODE3LDYuMjU4MDY1MTIgTDE3LjIzNzY4NzQsMTAuNTU4MDkyMyBMMTguNzExODU3MSwxMC41NTgwOTIzIEwyMC4yOTE0MzExLDYuMjQ5MTk3MjggTDIwLjI5MTQzMTEsMTAuNTU4MDkyMyBMMjEuOTUwMTEzNCwxMC41NTgwOTIzIEwyMS45NTAxMTM0LDQuNDE1MjIxNDEgTDE5LjM3MDA1MzIsNC40MTUyMjE0MSBaIE05LjEyOTEzOTk1LDQuNDE1MjIxNDEgTDYuNDE3Mzc5MDUsMTAuNTU4MDkyMyBMOC4yNjAyNjY2NywxMC41NTgwOTIzIEw4Ljc2OTMzMzcsOS4zMjk1MDA1OSBMMTEuNTk0OTcxOCw5LjMyOTUwMDU5IEwxMi4xMTI3MzExLDEwLjU1ODA5MjMgTDEzLjk5OTQzMTEsMTAuNTU4MDkyMyBMMTEuMjg3OTc3NSw0LjQxNTIyMTQxIEw5LjEyOTEzOTk1LDQuNDE1MjIxNDEgWiBNMTAuMTgyMTc0Nyw1Ljk0MjExNTE5IEwxMS4wMTU4ODM5LDcuOTUxNjkxOTcgTDkuMzQ4NDIxNTksNy45NTE2OTE5NyBMMTAuMTgyMTc0Nyw1Ljk0MjExNTE5IFogTTE5Ljc4MzExMDQsMTEuNDQ5NDg2NCBMMTcuOTg0MjEwOCwxMy40MTUyNTA4IEwxNi4yMDI2MDc5LDExLjQ0OTQ4NjQgTDE0LjAwMDA0NTcsMTEuNDQ5NDg2NCBMMTYuODk1OTI0MiwxNC41MjA5NjU4IEwxNC4wMDAwNDU3LDE3LjU5MjQwMTMgTDE2LjE0MTI3OTMsMTcuNTkyNDAxMyBMMTcuOTQ5MDQ2NywxNS42MDkwNzY4IEwxOS43NDgwNzgsMTcuNTkyNDAxMyBMMjEuOTUwMTEzNCwxNy41OTI0MDEzIEwxOS4wMzcyNDU1LDE0LjUwMzM2MTggTDIxLjk1MDExMzQsMTEuNDQ5NDg2NCBMMTkuNzgzMTEwNCwxMS40NDk0ODY0IFogTTguNzY5NzcyNywxMS40NDk0ODY0IEw4Ljc2OTc3MjcsMTcuNTkyNDAxMyBMMTMuOTk5OTE0LDE3LjU5MjQwMTMgTDEzLjk5OTkxNCwxNi4xNzA3MzYzIEwxMC40NDU5NzEyLDE2LjE3MDczNjMgTDEwLjQ0NTk3MTIsMTUuMjE0MTk0MyBMMTMuOTEyMjAxNCwxNS4yMTQxOTQzIEwxMy45MTIyMDE0LDEzLjgyNzU2MTcgTDEwLjQ0NTk3MTIsMTMuODI3NTYxNyBMMTAuNDQ1OTcxMiwxMi44NzExOTUzIEwxMy45OTk5MTQsMTIuODcxMTk1MyBMMTMuOTk5OTE0LDExLjQ0OTQ4NjQgTDguNzY5NzcyNywxMS40NDk0ODY0IFogTTIwLjI2MzI0NzIsMTQuNTA1OTUxOSBMMjEuOTUwMTEzNCwxNi4zMDA1NDkzIEwyMS45NTAxMTM0LDEyLjcyNjMyNDUgTDIwLjI2MzI0NzIsMTQuNTA1OTUxOSBaIiBpZD0iNTAweDUwMCIgZmlsbD0iIzAwNkZDRiIgZmlsbC1ydWxlPSJub256ZXJvIj48L3BhdGg+CiAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDwvZz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg=="
+                         class="amex mr-1" />
+                    <img alt="mastercard_icon_4"
+                         src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDI0LjAuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHZpZXdCb3g9IjAgMCAzMS4yNyAyMCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMzEuMjcgMjA7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPHN0eWxlIHR5cGU9InRleHQvY3NzIj4KCS5zdDB7ZmlsbDojRkZGRkZGO30KCS5zdDF7Y2xpcC1wYXRoOnVybCgjU1ZHSURfMl8pO2ZpbGw6I0Y2OEMxRTt9Cgkuc3Qye2NsaXAtcGF0aDp1cmwoI1NWR0lEXzJfKTtmaWxsOiMwMDAxMDU7fQoJLnN0M3tjbGlwLXBhdGg6dXJsKCNTVkdJRF8yXyk7ZmlsbDojMjMxRjIwO30KPC9zdHlsZT4KPHJlY3QgeD0iLTAuMDMiIHk9Ii0wLjA0IiBjbGFzcz0ic3QwIiB3aWR0aD0iMzEuMzIiIGhlaWdodD0iMjAuMDgiLz4KPGc+Cgk8ZGVmcz4KCQkKCQkJPHJlY3QgaWQ9IlNWR0lEXzFfIiB4PSI1LjYzIiB5PSItNS42MyIgdHJhbnNmb3JtPSJtYXRyaXgoMi41NTkyNTBlLTAzIC0xIDEgMi41NTkyNTBlLTAzIDUuNTkyOSAyNS42MDg4KSIgd2lkdGg9IjIwIiBoZWlnaHQ9IjMxLjI3Ii8+Cgk8L2RlZnM+Cgk8Y2xpcFBhdGggaWQ9IlNWR0lEXzJfIj4KCQk8dXNlIHhsaW5rOmhyZWY9IiNTVkdJRF8xXyIgIHN0eWxlPSJvdmVyZmxvdzp2aXNpYmxlOyIvPgoJPC9jbGlwUGF0aD4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0zMS4wNCwxMS4xNWMwLDAtOC41LDUuOTYtMjQuMDQsOC42bDI0LjAyLDAuMDZMMzEuMDQsMTEuMTV6Ii8+Cgk8cGF0aCBjbGFzcz0ic3QyIiBkPSJNMzEuMTgsMC4wNEwwLjAzLTAuMDRsLTAuMDUsMjBsMzEuMjcsMC4wOGwwLjA1LTIwTDMxLjE4LDAuMDR6IE0zMS4wNywwLjI3bC0wLjA1LDE5LjU1TDAuMiwxOS43MwoJCWMwLTAuMjIsMC4wNS0xOS4zMiwwLjA1LTE5LjU1QzAuNDcsMC4xOSwzMC44NCwwLjI3LDMxLjA3LDAuMjciLz4KCTxwYXRoIGNsYXNzPSJzdDIiIGQ9Ik0yLjc0LDYuMDlsLTEuMywwbC0wLjAxLDQuNTJsMS4yOSwwYzAuNjksMCwxLjE4LTAuMTYsMS42Mi0wLjUyYzAuNTItMC40MywwLjgyLTEuMDcsMC44My0xLjc0CgkJQzUuMTcsNy4wMiw0LjE4LDYuMDksMi43NCw2LjA5IE0zLjc3LDkuNDlDMy40OSw5Ljc0LDMuMTMsOS44NSwyLjU2LDkuODVsLTAuMjQsMGwwLjAxLTIuOTlsMC4yNCwwYzAuNTcsMCwwLjkyLDAuMSwxLjIxLDAuMzcKCQljMC4zLDAuMjcsMC40OSwwLjY5LDAuNDksMS4xM0M0LjI2LDguNzgsNC4wNyw5LjIyLDMuNzcsOS40OSIvPgoJCgkJPHJlY3QgeD0iMy43NSIgeT0iNy45MiIgdHJhbnNmb3JtPSJtYXRyaXgoMi41NTkyNTBlLTAzIC0xIDEgMi41NTkyNTBlLTAzIC0yLjM1ODEgMTQuMzUwOSkiIGNsYXNzPSJzdDIiIHdpZHRoPSI0LjUyIiBoZWlnaHQ9IjAuODgiLz4KCTxwYXRoIGNsYXNzPSJzdDIiIGQ9Ik04LjYyLDcuODRjLTAuNTMtMC4yLTAuNjgtMC4zMy0wLjY4LTAuNTdjMC0wLjI5LDAuMjgtMC41LDAuNjYtMC41YzAuMjYsMCwwLjQ4LDAuMTEsMC43MSwwLjM3bDAuNDYtMC42CgkJQzkuMzksNi4yLDguOTMsNi4wMyw4LjQ0LDYuMDNjLTAuOCwwLTEuNDEsMC41NS0xLjQxLDEuMjljMCwwLjYyLDAuMjgsMC45NCwxLjExLDEuMjRjMC4zNSwwLjEyLDAuNTIsMC4yLDAuNjEsMC4yNgoJCUM4LjkyLDguOTQsOSw5LjEsOSw5LjI5YzAsMC4zNy0wLjI5LDAuNjQtMC42OSwwLjY0Yy0wLjQyLDAtMC43Ni0wLjIxLTAuOTYtMC42MUw2Ljc4LDkuODdjMC40MSwwLjYsMC44OSwwLjg2LDEuNTYsMC44NwoJCWMwLjkyLDAsMS41Ni0wLjYxLDEuNTYtMS40OEM5LjkxLDguNTMsOS42Miw4LjIxLDguNjIsNy44NCIvPgoJPHBhdGggY2xhc3M9InN0MiIgZD0iTTEwLjE5LDguMzdjMCwxLjMzLDEuMDQsMi4zNiwyLjM4LDIuMzdjMC4zOCwwLDAuNy0wLjA3LDEuMTEtMC4yNmwwLTEuMDRjLTAuMzUsMC4zNS0wLjY3LDAuNDktMS4wNywwLjQ5CgkJYy0wLjg5LDAtMS41Mi0wLjY1LTEuNTItMS41NmMwLTAuODcsMC42NS0xLjU1LDEuNDgtMS41NWMwLjQyLDAsMC43NCwwLjE1LDEuMTEsMC41MWwwLTEuMDRjLTAuMzktMC4yLTAuNzEtMC4yOC0xLjA5LTAuMjgKCQlDMTEuMjcsNi4wMSwxMC4yLDcuMDYsMTAuMTksOC4zNyIvPgoJPHBvbHlnb24gY2xhc3M9InN0MiIgcG9pbnRzPSIyMC42OCw5LjE3IDE5LjQ5LDYuMTMgMTguNTIsNi4xMyAyMC40MywxMC43NyAyMC45LDEwLjc3IDIyLjg3LDYuMTQgMjEuOTEsNi4xNCAJIi8+Cgk8cG9seWdvbiBjbGFzcz0ic3QyIiBwb2ludHM9IjIzLjI2LDEwLjY2IDI1Ljc2LDEwLjY3IDI1Ljc2LDkuOSAyNC4xNCw5LjkgMjQuMTUsOC42OCAyNS43MSw4LjY4IDI1LjcxLDcuOTIgMjQuMTUsNy45MSAKCQkyNC4xNSw2LjkxIDI1Ljc3LDYuOTEgMjUuNzcsNi4xNSAyMy4yNyw2LjE0IAkiLz4KCTxwYXRoIGNsYXNzPSJzdDIiIGQ9Ik0yOS4yNiw3LjQ5YzAtMC44NS0wLjU4LTEuMzQtMS42LTEuMzRsLTEuMzEsMGwtMC4wMSw0LjUybDAuODgsMGwwLTEuODJsMC4xMSwwbDEuMjIsMS44MmwxLjA5LDBsLTEuNDItMS45MQoJCUMyOC45LDguNjQsMjkuMjYsOC4xOCwyOS4yNiw3LjQ5IE0yNy40OSw4LjIzbC0wLjI2LDBsMC0xLjM3bDAuMjcsMGMwLjU1LDAsMC44NSwwLjIzLDAuODUsMC42N0MyOC4zNSw3Ljk5LDI4LjA2LDguMjMsMjcuNDksOC4yMwoJCSIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTE4Ljc4LDguMzljMCwxLjMzLTEuMDgsMi40LTIuNDEsMi40Yy0xLjMzLDAtMi40LTEuMDgtMi40LTIuNDFjMC0xLjMzLDEuMDgtMi40LDIuNDEtMi40CgkJQzE3LjcxLDUuOTgsMTguNzgsNy4wNiwxOC43OCw4LjM5Ii8+Cgk8cGF0aCBjbGFzcz0ic3QzIiBkPSJNMjkuNzQsNi4yNWMwLTAuMDgtMC4wNS0wLjEyLTAuMTUtMC4xMmwtMC4xMywwbDAsMC40bDAuMSwwbDAtMC4xNWwwLjExLDAuMTVsMC4xMiwwbC0wLjEzLTAuMTYKCQlDMjkuNzEsNi4zNCwyOS43NCw2LjMsMjkuNzQsNi4yNSBNMjkuNTcsNi4zbC0wLjAyLDBsMC0wLjFsMC4wMiwwYzAuMDUsMCwwLjA3LDAuMDIsMC4wNywwLjA1QzI5LjY0LDYuMjgsMjkuNjIsNi4zLDI5LjU3LDYuMyIvPgoJPHBhdGggY2xhc3M9InN0MyIgZD0iTTI5LjYxLDUuOTdjLTAuMTksMC0wLjM1LDAuMTUtMC4zNSwwLjM1YzAsMC4xOSwwLjE1LDAuMzUsMC4zNSwwLjM1YzAuMTksMCwwLjM0LTAuMTYsMC4zNC0wLjM1CgkJQzI5Ljk1LDYuMTMsMjkuOCw1Ljk3LDI5LjYxLDUuOTcgTTI5LjYsNi42MWMtMC4xNSwwLTAuMjgtMC4xMy0wLjI4LTAuMjhjMC0wLjE2LDAuMTItMC4yOCwwLjI4LTAuMjhjMC4xNSwwLDAuMjcsMC4xMywwLjI3LDAuMjkKCQlDMjkuODgsNi40OCwyOS43Niw2LjYxLDI5LjYsNi42MSIvPgo8L2c+Cjwvc3ZnPgo="
+                         class="discover mr-1" />
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body text-center">
+                <!-- Mastercard Sonic Animation -->
+                <mc-sonic id="mc-sonic" sonicCue="checkout"></mc-sonic>
+
+                <h3 class="animation-title mt-3">
+                    Processing Checkout
+                </h3>
+                <p class="animation-desc">
+                    Please wait while we securely process your checkout…
+                </p>
+
+                <div class="loader mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Header -->
+<nav class="mc-oba-header extra-padding">
+    <div class="mc-oba-header-left">
+        <img src="/assets/images/mc_symbol_opt_73_3x.png" alt="Mastercard" class="mc-oba-logo" />
+        <a href="https://developer.mastercard.com/mastercard-checkout-solutions/documentation/use-cases/click-to-pay/"
+           class="mc-oba-developers-link" target="_blank">
+            developers<i class="fa-solid fa-arrow-up-right-from-square"></i>
+        </a>
+    </div>
+    <div class="mc-oba-header-center">
+        <span class="mc-oba-header-app">REFERENCE APP</span>
+        <span class="mc-oba-header-title">MCS - Click to Pay : (3rd Party SRC Integration)
+            </span>
+    </div>
+    <div class="mc-oba-header-right">
+        <a href="https://developer.mastercard.com/mastercard-checkout-solutions/documentation/api-reference/apis/"
+           class="mc-oba-github-link" target="_blank">
+            API Reference
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        </a>
+    </div>
+</nav>
+<!-- Main -->
+<div class="main-flex">
+    <!-- LEFT: Summary & Stepper -->
+    <div>
+        <div class="card-summary text-center mb-4">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" class="mc-logo mb-2"
+                 alt="MC" />
+            <div class="order-summary">SRC Integration</div>
+            <div style="font-size: 15px; color: #666">
+                Securely pay with
+                <span style="font-weight: 600; letter-spacing: 0.07em">Mastercard Click to Pay</span>.<br />
+            </div>
+            <div class="mt-4 oba-secure">
+                <i class="bi bi-lock-fill" style="font-size: 1.3rem"></i>
+                SSL Secured
+            </div>
+        </div>
+        <!-- Stepper -->
+        <ul class="oba-stepper" id="oba-stepper"></ul>
+    </div>
+    <!-- RIGHT: Step Action -->
+    <div class="step-action-pane">
+        <div id="step-1" class="step-action-content">
+            <div class="step-action-title">Step 1: Innit SRC</div>
+            <div class="step-action-desc">
+                The <b>init()</b> method initializes the JS library for
+                each participating network in Click To Pay.
+            </div>
+            <form id="srcInitForm" autocomplete="off">
+                <div class="row g-3 align-items-center mb-1">
+                    <div class="col-md-6">
+                        <label class="form-label" for="clientid">SRC Client ID:
+                            <span class="form-required">*</span></label>
+                        <input class="form-control" type="text" name="clientid" id="clientid"
+                               value="5b7f4992-558b-4270-99b5-c35825b1fb9e" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="dpaid">SRC DPA ID:
+                            <span class="form-required">*</span></label>
+                        <input class="form-control" type="text" name="dpaid" id="dpaid"
+                               value="26631c99-62b8-49b2-9a90-0b71444d74fa" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="transactionid">SRC Transaction ID:
+                            <span class="form-required">*</span></label>
+                        <input class="form-control" type="text" name="transactionid" id="transactionid" required />
+                    </div>
+                    <div style="display: none;" class="col-md-6">
+                        <label class="form-label" for="serviceId">Service ID:
+                            <span class="form-required">*</span></label>
+                        <input class="form-control" type="text" name="serviceId" id="serviceId"
+                               value="SECURE_COF_MERCHANT#Moovetshop#01" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="dpalocale">DPA Locale:
+                            <span class="form-required">*</span></label>
+                        <input class="form-control" type="text" name="dpalocale" id="dpalocale" value="en_US"
+                               required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Transaction Amount/Currency:
+                            <span class="form-required">*</span></label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" name="txnAmount" id="txnAmount" value="10"
+                                   min="1" required style="max-width: 90px" />
+                            <span class="input-group-text">/</span>
+                            <input type="text" class="form-control" name="txnCurrency" id="txnCurrency"
+                                   placeholder="USD" value="USD" style="max-width: 80px" required />
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="visibility: hidden;">
+                        <label class="form-label" for="consumerkey">SRC Signing Consumer Key:</label>
+                        <input class="form-control" type="text" name="consumerkey" id="consumerkey" />
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label me-2">Type of cryptogram:</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="cryptogram" id="dsrp"
+                                   value="CARD_APPLICATION_CRYPTOGRAM_SHORT_FORM" checked />
+                            <label class="form-check-label" for="dsrp">DSRP</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="cryptogram" id="dtvc"
+                                   value="DYNAMIC_CARD_SECURITY_CODE" />
+                            <label class="form-check-label" for="dtvc">DTVC</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="cryptogram" id="none" value="NONE" />
+                            <label class="form-check-label" for="none">NONE</label>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label me-2">Payload Type Indicator Checkout:</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="IndicatorCheckout" id="summary"
+                                   value="SUMMARY" checked />
+                            <label class="form-check-label" for="summary">SUMMARY</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="IndicatorCheckout" id="full"
+                                   value="FULL" />
+                            <label class="form-check-label" for="full">FULL</label>
+                        </div>
+                    </div>
+                    <div class="col-12 form-section-divider"></div>
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="shipping" name="shipping" />
+                            <label class="form-check-label" for="shipping">Allow Shipping Address</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="billing" name="billing" />
+                            <label class="form-check-label" for="billing">Allow Billing Address</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="confirmPayment"
+                                   name="confirmPayment" />
+                            <label class="form-check-label" for="confirmPayment">Confirm Payment</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="suppressDCF" name="suppressDCF" />
+                            <label class="form-check-label" for="suppressDCF">Suppress DCF</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="inlineDCF" name="inlineDCF" />
+                            <label class="form-check-label" for="inlineDCF">Inline DCF (iFrame)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="consumerNameRequested"
+                                   name="consumerNameRequested" checked />
+                            <label class="form-check-label" for="consumerNameRequested">Consumer Name
+                                Requested</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mt-0">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="consumerEmailAddressRequested"
+                                   name="consumerEmailAddressRequested" checked />
+                            <label class="form-check-label" for="consumerEmailAddressRequested">Consumer eMail
+                                Requested
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mt-0">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="consumerPhoneNumberRequested"
+                                   name="consumerPhoneNumberRequested" checked />
+                            <label class="form-check-label" for="consumerPhoneNumberRequested">Consumer Phone
+                                Requested
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-12 form-section-divider"></div>
+
+                    <div class="col-12 mb-4">
+                        <button class="collapse-toggle-btn" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#authSettingsCollapse" aria-expanded="false"
+                                aria-controls="authSettingsCollapse">
+                            <i class="bi bi-shield-lock me-1"></i>
+                            Authentication Settings
+                            <i class="bi bi-chevron-down ms-1"></i>
+                        </button>
+
+                        <div class="collapse" id="authSettingsCollapse">
+                            <div class="card card-body border-0 p-4">
+
+                                <!-- Begin Collapsible Content -->
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="tasAuth" name="tasAuth" />
+                                    <label class="form-check-label" for="tasAuth">Use Authentication (TAS)</label>
+                                </div>
+
+                                <div class="mb-2">
+                                    <span class="fw-semibold mb-2 d-block">EMV 3DS Merchant configuration</span>
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="merchantCategoryCode">Merchant Category Code:
+                                            <span class="form-required"></span></label>
+                                        <input class="form-control" type="text" name="merchantCategoryCode"
+                                               id="merchantCategoryCode" value="5995" required />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="merchantCountryCode">Merchant Country Code:
+                                            <span class="form-required"></span></label>
+                                        <input class="form-control" type="text" name="merchantCountryCode"
+                                               id="merchantCountryCode" value="US" required />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="acquirerMerchantId">Acquirer Merchant ID:
+                                            <span class="form-required"></span></label>
+                                        <input class="form-control" type="text" name="acquirerMerchantId"
+                                               id="acquirerMerchantId" value="SRC3DS" required />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="acquirerBin">Acquirer BIN: <span
+                                                class="form-required"></span></label>
+                                        <input class="form-control" type="text" name="acquirerBin" id="acquirerBin"
+                                               value="545301" required />
+                                    </div>
+                                </div>
+                                <!-- End Collapsible Content -->
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4" style="display: none;">
+                        <tr style="display: none;">
+                            <td class="table-width-fifty-percent">
+                                SRC Signing Private Key (In PKCS1 RSA PEM Format):<br />
+                                <p class="openssl-text">openssl pkcs12 -in key.p12 | openssl rsa -out
+                                    key.key</p>
+                                <textarea id="privatekey" name="privatekey" rows="10" cols="2"></textarea>
+                            </td>
+                            <td>
+                                SRC Encrypition Key - To Decrypt Payload (In PEM Format):<br />
+                                <p class="openssl-text">openssl pkcs12 -in enc.p12 | openssl rsa -out
+                                    enc.key</p>
+                                Note: Please see decrypted payload in the browser Console Log.</br />
+                                <textarea id="encprivatekey" name="encprivatekey" rows="10" cols="2"></textarea>
+                            </td>
+                        </tr>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <button class="cta-btn" type="button" onclick="init();">
+                        Init SRC
+                    </button>
+                    <button type="button" id="isRecognizedBtn" class="btn btn-dark" onclick="isRecognized()">
+                        <i class="bi bi-question-circle"></i> Is
+                        Recognized?
+                    </button>
+                </div>
+                <div class="mt-4">
+                    <button class="btn btn-outline-success" type="button" onclick="checkAndSetStepForInit()">
+                        Next: Choose Flow
+                    </button>
+                </div>
+            </form>
+        </div>
+        <!-- STEP 2: Choose Flow -->
+        <div id="step-2" class="step-action-content d-none">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="step-action-title mb-0">
+                    Step 2: Choose Flow
+                </div>
+                <button type="button" class="btn p-0 border-0 bg-transparent d-flex align-items-center"
+                        onclick="setStep(1)" title="Go Back">
+                    <i class="bi bi-arrow-left-circle" style="font-size: 1.4rem; color: #ff6f00"></i>
+                    <span class="ms-1 fw-medium go-back-link" style="color: #ff6f00">Go Back</span>
+                </button>
+            </div>
+
+            <div class="step-action-desc">
+                Please select your flow to continue:
+            </div>
+            <div class="mb-3">
+                <button class="cta-btn me-2" id="newUserBtn" onclick="chooseFlow('new')">
+                    New User
+                </button>
+                <button class="btn btn-dark" id="returnUserBtn" onclick="chooseFlow('return')">
+                    Returning User
+                </button>
+            </div>
+        </div>
+        <!-- STEP 3A: RETURN USER -->
+        <div id="step-3-return" class="step-action-content d-none">
+            <div class="d-flex justify-content-between flex-wrap gap-2 mb-2">
+                <div class="step-action-title mb-0 flex-grow-1">
+                    Step 3: Returning User – Verify your identity
+                </div>
+                <button type="button" class="btn p-0 border-0 bg-transparent d-flex align-items-center"
+                        onclick="setStep(2)" title="Go Back">
+                    <i class="bi bi-arrow-left-circle" style="font-size: 1.4rem; color: #ff6f00"></i>
+                    <span class="ms-1 fw-medium go-back-link" style="color: #ff6f00">Go Back</span>
+                </button>
+            </div>
+
+            <div class="step-action-desc">
+                Verify your identity and eligibility for Click to
+                Pay.<br />
+                Complete all three steps below to continue.
+            </div>
+
+            <!-- TABS -->
+            <ul class="nav nav-wizard" id="eligibilityTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="lookup-tab" data-bs-toggle="tab" data-bs-target="#lookup"
+                            type="button" role="tab">
+                        Identity Lookup
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="initiate-tab" data-bs-toggle="tab" data-bs-target="#initiate"
+                            type="button" role="tab">
+                        Initiate Identity Validation
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="otp-tab" data-bs-toggle="tab" data-bs-target="#otpBox"
+                            type="button" role="tab">
+                        Validate OTP
+                    </button>
+                </li>
+            </ul>
+
+            <!-- TAB CONTENTS -->
+            <div class="tab-content" id="eligibilityTabsContent">
+                <!-- TAB 1: Identity Lookup -->
+                <div class="tab-pane fade show active" id="lookup" role="tabpanel">
+                    <form id="identityLookupForm" autocomplete="off" class="mb-3">
+                        <div class="mb-3" style="max-width: 340px">
+                            <label for="identityEmail" class="form-label">
+                                Email (for Lookup):<span class="form-required">*</span>
+                            </label>
+                            <input type="email" class="form-control" id="email" name="email"
+                                   placeholder="Enter user email" required />
+                        </div>
+                        <button type="button" class="cta-btn" id="identityLookupBtn" onclick="IdentityLookup()">
+                            <i class="bi bi-search"></i> Identity Lookup
+                        </button>
+                    </form>
+                </div>
+                <!-- TAB 2: Initiate Identity Validation -->
+                <div class="tab-pane fade" id="initiate" role="tabpanel">
+                    <form id="initiateValidationForm" autocomplete="off" class="mb-3">
+                        <div class="mb-3" style="max-width: 340px">
+                            <label class="form-label mb-2">Validation Channel:</label>
+                            <div class="mb-2">
+                                <input type="radio" class="form-check-input" name="identityV" id="identityVEmail"
+                                       value="email" checked />
+                                <label for="identityVEmail" class="form-check-label"
+                                       style="margin-right: 15px">Email</label>
+                                <input type="radio" class="form-check-input" name="identityV" id="identityVPhone"
+                                       value="phone" />
+                                <label for="identityVPhone" class="form-check-label">Phone</label>
+                            </div>
+                        </div>
+                        <button type="button" class="cta-btn" id="initiateValidationBtn"
+                                onclick="InitiateIdentityValidation()">
+                            <i class="bi bi-envelope"></i> Send OTP
+                        </button>
+                    </form>
+                </div>
+
+                <!-- TAB 3: Validate OTP -->
+                <div class="tab-pane fade" id="otpBox" role="tabpanel">
+                    <form id="validateOtpForm" autocomplete="off" class="mb-3">
+                        <div class="mb-3" style="max-width: 340px">
+                            <label class="form-label">Enter OTP:</label>
+                            <input type="text" class="form-control" id="otp" name="otp"
+                                   placeholder="Enter received OTP" required />
+                        </div>
+                        <button type="button" class="cta-btn" id="validateOtpBtn"
+                                onclick="CompleteIdentityValidation()">
+                            <i class="bi bi-shield-lock"></i> Validate
+                            OTP
+                        </button>
+                    </form>
+                    <div id="trRememberMe2" name="trRememberMe2" style="display: none">
+                        <label class="toggle">
+                            <input class="toggle-checkbox" type="checkbox" id="rememberMe2" name="rememberMe2" />
+                            <div class="toggle-switch"></div>
+                            <span class="toggle-label">Remember Me in this Browser</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <button class="btn btn-outline-success" type="button" onclick="checkAndSetStepAfterValidation();">
+                    Go to Next Step
+                </button>
+            </div>
+        </div>
+
+        <!-- STEP 3B: NEW USER -->
+        <div id="step-3-new" class="step-action-content d-none">
+            <!-- New User registration fields -->
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="step-action-title mb-0">
+                    Step 3: New User-New Card Flow
+                </div>
+                <button type="button" class="btn p-0 border-0 bg-transparent d-flex align-items-center"
+                        onclick="setStep(2)" title="Go Back">
+                    <i class="bi bi-arrow-left-circle" style="font-size: 1.4rem; color: #ff6f00"></i>
+                    <span class="ms-1 fw-medium go-back-link" style="color: #ff6f00">Go Back</span>
+                </button>
+            </div>
+
+            <form id="newUserCardForm" class="needs-validation" novalidate>
+                <!-- Card Holder Details -->
+                <div class="mb-4">
+                    <h5 class="mb-3 fw-semibold">
+                        Card Holder Details
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="oldcardholdername" class="form-label">Card Holder Name
+                                <span class="form-required">*</span></label>
+                            <input type="text" class="form-control" id="oldcardholdername" name="oldcardholdername"
+                                   required onchange='EncryptCard("old")' />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="oldcardnumber" class="form-label">Card Number
+                                <span class="form-required">*</span></label>
+                            <input type="text" class="form-control" id="oldcardnumber" name="oldcardnumber"
+                                   maxlength="19" placeholder="XXXX XXXX XXXX XXXX" required
+                                   onchange='EncryptCard("old")' />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="oldinputExpDate" class="form-label">Expiry Date ((MM / YYYY))
+                                <span class="form-required">*</span></label>
+                            <input type="text" class="form-control expdate" id="oldinputExpDate"
+                                   name="oldinputExpDate" maxlength="9" size="9" placeholder="MM / YYYY" required
+                                   onchange='EncryptCard("old")' />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="oldcvvnumber" class="form-label">CVV
+                                <span class="form-required">*</span></label>
+                            <input type="password" class="form-control" id="oldcvvnumber" name="oldcvvnumber"
+                                   maxlength="4" required onchange='EncryptCard("old")' />
+                        </div>
+                        <div class="col-md-6" style="display: none">
+                            <label class="toggle">
+                                <span class="toggle-label">Remember Me in this Browser</span>
+                                <input class="toggle-checkbox" type="checkbox" id="rememberMe1"
+                                       name="rememberMe1" />
+                                <div class="toggle-switch"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Billing Address -->
+                <div class="mb-4 form-section-divider"></div>
+                <div class="mb-4">
+                    <h5 class="mb-3 fw-semibold">Billing Address</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="billingAddName" class="form-label">Biller Name
+                                <span class="form-required">*</span></label>
+                            <input type="text" class="form-control" id="billingAddName" name="billingAddName"
+                                   required onchange='EncryptCard("old")' />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="billingAddLine1" class="form-label">Address Line 1
+                                <span class="form-required">*</span></label>
+                            <input type="text" class="form-control" id="billingAddLine1" name="billingAddLine1"
+                                   required onchange='EncryptCard("old")' />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="billingAddLine2" class="form-label">Address Line 2</label>
+                            <input type="text" class="form-control" id="billingAddLine2" name="billingAddLine2"
+                                   onchange='EncryptCard("old")' />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="billingAddLine3" class="form-label">Address Line 3</label>
+                            <input type="text" class="form-control" id="billingAddLine3" name="billingAddLine3"
+                                   onchange='EncryptCard("old")' />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="billingAddCity" class="form-label">City
+                                <span class="form-required">*</span></label>
+                            <input type="text" class="form-control" id="billingAddCity" name="billingAddCity"
+                                   required onchange='EncryptCard("old")' />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="billingAddState" class="form-label">State
+                                <span class="form-required">*</span></label>
+                            <input type="text" class="form-control" id="billingAddState" name="billingAddState"
+                                   required onchange='EncryptCard("old")' />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="billingAddZip" class="form-label">ZIP Code
+                                <span class="form-required">*</span></label>
+                            <input type="text" class="form-control" id="billingAddZip" name="billingAddZip" required
+                                   onchange='EncryptCard("old")' />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="billingCountryCode" class="form-label">Country Code
+                                <span class="form-required">*</span></label>
+                            <input type="text" class="form-control" id="billingCountryCode"
+                                   name="billingCountryCode" value="US" required onchange='EncryptCard("old")' />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Consumer Personal Info -->
+                <div class="mb-4 form-section-divider"></div>
+                <div class="mb-4">
+                    <h5 class="mb-3 fw-semibold">
+                        Consumer Personal Info (Optional)
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="oldcardholderfname" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="oldcardholderfname"
+                                   name="oldcardholderfname" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="oldcardholderlname" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="oldcardholderlname"
+                                   name="oldcardholderlname" />
+                        </div>
+                        <div class="col-md-6 d-flex align-items-end">
+                            <div class="w-100">
+                                <label for="consumerMobileCountryCode" class="form-label">Mobile (Country Code -
+                                    Number)</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="consumerMobileCountryCode"
+                                           name="consumerMobileCountryCode" maxlength="3" style="max-width: 80px" />
+                                    <span class="input-group-text">-</span>
+                                    <input type="text" class="form-control" id="consumerMobileNumber"
+                                           name="consumerMobileNumber" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="consumerEmail" class="form-label">Email</label>
+                            <input type="text" class="form-control" id="consumerEmail" name="consumerEmail" />
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <button class="hide-btn" onClick='EncryptCard("old")'>
+                        <a href="#" style="display: none">
+                            Encrypt Card
+                        </a>
+                    </button>
+                    <br />
+                    <button type="button" class="btn btn-success btn-lg w-100" id="newUserCheckoutBtn"
+                            onclick="Checkout()">
+                        <img alt="mastercard-src-chk-btn" style="
+                                        vertical-align: middle;
+                                        margin-right: 10px;
+                                    "
+                             src="https://src.mastercard.com/assets/img/btn/src_chk_btn_126x030px.svg?locale=en_us&amp;paymentmethod=master" />
+                        Checkout with Click to Pay
+                    </button>
+                </div>
+
+                <p>
+                    <span style="visibility: hidden" id="plaintext"></span>
+                </p>
+                <p style="visibility: hidden">
+                    Encrypted Card:
+                    <input type="text" name="ciphertext" id="ciphertext" value="" style="width: 100%" hidden />
+                </p>
+                <br />
+            </form>
+        </div>
+
+        <div id="step-4" class="step-action-content d-none">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="step-action-title mb-0">
+                    Step 4: Credit/Debit Card
+                </div>
+                <button type="button" class="btn p-0 border-0 bg-transparent d-flex align-items-center"
+                        onclick="setStep(3)" title="Go Back">
+                    <i class="bi bi-arrow-left-circle" style="font-size: 1.4rem; color: #ff6f00"></i>
+                    <span class="ms-1 fw-medium go-back-link" style="color: #ff6f00">Go Back</span>
+                </button>
+            </div>
+
+            <div class="step-action-desc mb-3">
+                Add and tokenize your Mastercard for secure storage.<br />
+                This card will be protected with Mastercard's security.
+            </div>
+
+            <div class="mb-3 d-flex justify-content-end align-items-center" id="addCardBtnWrap"
+                 style="display: none">
+                <button type="button" class="btn btn-outline-primary" id="addCardBtn">
+                    <i class="bi bi-plus-circle"></i> Add Card
+                </button>
+            </div>
+
+            <div id="cardList" class="row row-cols-1 row-cols-md-2 g-3"></div>
+
+            <div class="d-flex gap-3 my-2" id="cardActionsBar" style="display: none">
+                <button style="display: none" type="button" class="btn btn-outline-danger" id="deleteCardBtn"
+                        onclick="DeleteCard()">
+                    <i class="bi bi-trash"></i> Delete Card
+                </button>
+                <button type="button" class="btn btn-outline-secondary" id="notYourCardsBtn"
+                        onclick="SignOut(', listed cards are not yours?')">
+                    <i class="bi bi-person-x"></i> Not Your Cards?
+                </button>
+            </div>
+
+            <div class="mt-3 mb-4" id="checkoutBar" style="display: none">
+                <button type="button" class="btn btn-success btn-lg w-100" id="returnUserCheckoutBtn"
+                        onclick="ReturnUserCheckout()">
+                    <img alt="payment-method" style="
+                                    vertical-align: middle;
+                                    margin-right: 10px;
+                                "
+                         src="https://src.mastercard.com/assets/img/btn/src_chk_btn_126x030px.svg?locale=en_us&paymentmethod=master" />
+                    Checkout with Click to Pay
+                </button>
+            </div>
+
+            <form id="addCardForm" autocomplete="off" class="row g-3">
+                <div class="col-12">
+                    <label for="cardnumber" class="form-label">Card Number
+                        <span class="form-required">*</span></label>
+                    <input name="cardnumber" id="cardnumber" type="text" class="form-control ccFormatMonitor"
+                           placeholder="Card Number" required onchange='EncryptCard("new")' />
+                </div>
+                <div class="col-6 col-md-4">
+                    <label for="newinputExpDate" class="form-label">Expiry (MM / YYYY)
+                        <span class="form-required">*</span></label>
+                    <input type="text" id="newinputExpDate" class="form-control expdate" placeholder="MM / YYYY"
+                           maxlength="9" size="9" required onchange='EncryptCard("new")' />
+                </div>
+                <div class="col-6 col-md-4">
+                    <label for="cvvnumber" class="form-label">CVV <span class="form-required">*</span></label>
+                    <input name="cvvnumber" id="cvvnumber" type="password" class="form-control cvv"
+                           placeholder="CVV" maxlength="4" size="7" required onchange='EncryptCard("new")' />
+                </div>
+                <div class="col-12 col-md-4">
+                    <label for="cardholdername" class="form-label">Card Holder Name</label>
+                    <input type="text" name="cardholdername" id="cardholdername" class="form-control"
+                           placeholder="Card Holder Name" onchange='EncryptCard("new")' />
+                </div>
+                <input type="text" name="newciphertext" id="newciphertext" class="form-control"
+                       placeholder="Encrypted Card" readonly hidden />
+                <div class="col-12 hide-view">
+                    <div id="newplaintext" class="alert alert-secondary mt-2" style="
+                                    font-family: monospace;
+                                    font-size: 0.97em;
+                                    word-break: break-all;
+                                ">
+                        <pre id="newplaintext-pre" style="margin-bottom: 0"></pre>
+                    </div>
+                </div>
+                <!-- Hidden Encrypt Card button (legacy) -->
+                <button type="button" class="hide-btn" onclick='EncryptCard("new")' style="display: none"></button>
+                <div class="col-12 d-flex mt-4">
+                    <button type="button" class="cta-btn" onclick="EnrollCard()">
+                        Enroll Card
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary ms-3" id="cancelAddCardBtn">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+
+            <div style="display: none" class="mt-4">
+                <button class="btn btn-outline-success" type="button" onclick="goToCheckout()">
+                    Go to Next Step
+                </button>
+            </div>
+        </div>
+        <div id="step-5" class="step-action-content d-none">
+            <div class="step-action-title">Step 4: Checkout</div>
+            <div class="step-action-desc">
+                Complete your payment securely using Click to Pay.<br />
+                All data is protected and encrypted.
+            </div>
+            <button class="cta-btn btn-success text-white" onclick="alert('Payment completed!')">
+                Complete Checkout
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- toaster body -->
+<!-- Toast container (bottom-right corner) -->
+<div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 9999">
+    <div id="mainToast" class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive"
+         aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toastBody">...</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<div class="iframe-container slide-in" id="iframeContainer">
+    <div class="iframe-foreground">
+        <iframe title="iframe-checkout-title" class="iframe-checkout" id="checkoutIframe"
+                name="checkout-iframe"></iframe>
+    </div>
+    <div class="iframe-background" id="iframeBackground" />
+</div>
+
+<script>
+    const stepTemplates = {
+        base: [
+            {
+                title: "Init SRC",
+                desc: "Initialize SDK session",
+                icon: "bi-gear",
+            },
+            {
+                title: "Choose Flow",
+                desc: "New User or Return User",
+                icon: "bi-toggle2-on",
+            },
+        ],
+        returnUser: [
+            {
+                title: "Identity Lookup",
+                desc: "Verify your identity",
+                icon: "bi-person-check",
+            },
+            {
+                title: "Credit/Debit Card & Checkout",
+                desc: "Card List/Add Card & Checkout With Card",
+                icon: "bi-credit-card",
+            },
+        ],
+        newUser: [
+            {
+                title: "Enroll/Add Card & Checkout",
+                desc: "Add new card (for new user) & Checkout With Card",
+                icon: "bi-credit-card",
+            },
+        ],
+    };
+
+    window.currentFlow = null;
+
+    // Initial render (show base steps)
+    renderStepper(null); // base steps
+    setStep(1); // right pane step 1
+
+    // Only call this on page load and when user chooses flow
+    function renderStepper(flowType) {
+        let steps = [...stepTemplates.base];
+        if (flowType === "return") {
+            steps = steps.concat(stepTemplates.returnUser);
+        } else if (flowType === "new") {
+            steps = steps.concat(stepTemplates.newUser);
+        }
+        let html = "";
+        steps.forEach((step, i) => {
+            html += `
+        <li class="oba-step future" data-step="${i + 1}">
+            <div class="oba-step-icon"><i class="bi ${step.icon}"></i></div>
+            <div class="oba-step-labels">
+                <div class="oba-step-title">${step.title}</div>
+                <div class="oba-step-desc">${step.desc}</div>
+            </div>
+        </li>
+    `;
+        });
+        document.getElementById("oba-stepper").innerHTML = html;
+        setStepperStep(1); // Always highlight the first step at first
+    }
+
+    // Stepper switching logic
+    // Show/hide right pane steps, keep left in sync
+    function setStep(n) {
+        // Hide all right-side step content
+        document
+            .querySelectorAll(".step-action-content")
+            .forEach((el) => el.classList.add("d-none"));
+
+        // Show only the relevant right-side pane
+        if (n === 1) {
+            document
+                .getElementById("step-1")
+                .classList.remove("d-none");
+        } else if (n === 2) {
+            document
+                .getElementById("step-2")
+                .classList.remove("d-none");
+        } else if (window.currentFlow === "return") {
+            if (n === 3)
+                document
+                    .getElementById("step-3-return")
+                    .classList.remove("d-none");
+            if (n === 4)
+                document
+                    .getElementById("step-4")
+                    .classList.remove("d-none");
+            if (n === 5)
+                document
+                    .getElementById("step-5")
+                    .classList.remove("d-none");
+        } else if (window.currentFlow === "new") {
+            if (n === 3)
+                document
+                    .getElementById("step-3-new")
+                    .classList.remove("d-none");
+            if (n === 4)
+                document
+                    .getElementById("step-4")
+                    .classList.remove("d-none");
+            if (n === 5)
+                document
+                    .getElementById("step-5")
+                    .classList.remove("d-none");
+        }
+        setStepperStep(n);
+    }
+
+    // When user clicks New/Return
+    function chooseFlow(flow) {
+        window.currentFlow = flow;
+        renderStepper(flow);
+        setStep(3);
+    }
+
+    // Update the stepper visual
+    function setStepperStep(n) {
+        document.querySelectorAll(".oba-step").forEach((step, idx) => {
+            step.classList.remove("current", "completed", "future");
+            if (idx + 1 < n) step.classList.add("completed");
+            else if (idx + 1 === n) step.classList.add("current");
+            else step.classList.add("future");
+        });
+    }
+
+    // Step advance buttons
+    function showEnrollCardStepForReturnUser() {
+        setStep(4);
+        GetSRCProfile();
+    }
+
+    // For New User, after registration, show Enroll/Add Card step
+    function showEnrollCardStepForNewUser() {
+        setStep(4);
+    }
+
+    // After card enrollment, show Checkout
+    function goToCheckout() {
+        setStep(5);
+    }
+</script>
+
+<!-- Bootstrap 5 Bundle JS (includes Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://sandbox.src.mastercard.com/sdk/srcsdk.mastercard.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/0.10.0/lodash.min.js"></script>
+<script src="/assets/js/jquery.cookie.js"></script>
+<script src="/assets/js/jwt-js-decode.min.js"></script>
+<script type="text/javascript" src="/assets/js/pem2jwk.js"></script>
+<script type="text/javascript" src="/assets/js/hybrid-crypto.min.js"></script>
+<script type="text/javascript" src="/assets/js/jose.js"></script>
+
+<script src="/assets/js/srcsandbox.js"></script>
+<script src="/assets/js/mc-sonic.min.js"></script>
+<script src="/assets/js/environment.js"></script>
+
+<script type="text/javascript">
+    let checkoutIframe;
+    let iframeContainer;
+    let iframeBackground;
+    let suppressDCF = false;
+    let rememberMe = false;
+    let allowShipping = false;
+    let allowBilling = false;
+    let inlineDCF = false;
+    let confPayment = false;
+    let functionStats = false;
+    let recognized = false;
+    let authenticationType = false;
+
+    $(document).ready(function () {
+        let coll = document.getElementsByClassName("collapsible");
+        let i;
+
+        for (i = 0; i < coll.length; i++) {
+            coll[i].addEventListener("click", function () {
+                this.classList.toggle("active");
+                $("#content").fadeToggle("slow");
+            });
+        }
+        let collUI = document.getElementsByClassName("collapsibleUI");
+
+        for (i = 0; i < collUI.length; i++) {
+            collUI[i].addEventListener("click", function () {
+                this.classList.toggle("active");
+                $("#contentUI").fadeToggle("slow");
+            });
+        }
+        // Handler for .ready() called.
+        $("#transactionid").val(create_UUID());
+
+        $("#customInput").click(function () {
+            loadInputBox();
+        });
+        $("#inlineDCF").click(function () {
+            inlineDCF = this.checked;
+        });
+        $("#authenticationType").click(function () {
+            authenticationType = this.checked;
+            if (this.checked) {
+                $(
+                    "input[name=cryptogram][value='CARD_APPLICATION_CRYPTOGRAM_SHORT_FORM']"
+                ).prop("checked", true);
+                $("input[name=cryptogram]").prop("disabled", true);
+            } else {
+                $("input[name=cryptogram]").prop("disabled", false);
+            }
+        });
+
+        $("#show").click(function () {
+            $("#billingAdd").toggle("slide");
+        });
+
+        checkoutIframe = document.getElementById("checkoutIframe");
+        iframeContainer = document.getElementById("iframeContainer");
+        iframeBackground = document.getElementById("iframeBackground");
+        getConfig();
+
+        $("#suppressDCF").click(function () {
+            suppressDCF = this.checked;
+            if (this.checked) {
+                inlineDCF = true;
+                allowShipping = false;
+                allowBilling = false;
+                confPayment = false;
+                $("#trRememberMe1").show();
+                $("#trRememberMe2").show();
+                $("#inlineDCF").prop("checked", true);
+                $("#inlineDCF").prop("disabled", true);
+
+                $("#shipping").prop("checked", false);
+                $("#shipping").prop("disabled", true);
+
+                $("#billing").prop("checked", false);
+                $("#billing").prop("disabled", true);
+
+                $("#confirmPayment").prop("checked", false);
+                $("#confirmPayment").prop("disabled", true);
+            } else {
+                $("#trRememberMe1").hide();
+                $("#trRememberMe2").hide();
+                $("#inlineDCF").prop("disabled", false);
+                $("#billing").prop("disabled", false);
+                $("#shipping").prop("disabled", false);
+                $("#confirmPayment").prop("disabled", false);
+
+                rememberMe = false;
+                $("#rememberMe1").prop("checked", false);
+                $("#rememberMe2").prop("checked", false);
+            }
+        });
+        $("#rememberMe1").click(function () {
+            rememberMe = this.checked;
+            $("#rememberMe2").prop("checked", this.checked);
+        });
+        $("#rememberMe2").click(function () {
+            rememberMe = this.checked;
+            $("#rememberMe1").prop("checked", this.checked);
+        });
+        $("#shipping").click(function () {
+            allowShipping = this.checked;
+        });
+        $("#billing").click(function () {
+            allowBilling = this.checked;
+        });
+        $("#confirmPayment").click(function () {
+            confPayment = this.checked;
+        });
+
+        // Handle Add Card button click
+        $("#addCardBtn").on("click", function () {
+            $("#addCardForm").slideDown(180, function () {
+                $("#cardnumber").focus();
+            });
+            $("#addCardBtnWrap").hide();
+            // Optionally scroll to form if needed
+            $("html, body").animate(
+                {
+                    scrollTop: $("#addCardForm").offset().top - 100,
+                },
+                250
+            );
+        });
+
+        // Handle Cancel button click
+        $("#cancelAddCardBtn").on("click", function () {
+            $("#addCardForm")[0].reset();
+            $("#addCardForm").slideUp(160);
+            $("#addCardBtnWrap").show();
+        });
+    });
+    function showCheckoutIframe() {
+        iframeContainer.classList.add("show");
+        document.body.classList.add("modal-visible");
+    }
+
+    function dismissCheckoutIframe() {
+        iframeContainer.classList.remove("show");
+        document.body.classList.remove("modal-visible");
+    }
+    function openTab(evt, tabName) {
+        let i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(
+                " activetab",
+                ""
+            );
+        }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " activetab";
+    }
+
+    function openTab1(evt, tabName) {
+        let i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent1");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablinks1");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(
+                " activetab",
+                ""
+            );
+        }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " activetab";
+    }
+
+    function showTab1(btnName, tabName) {
+        let i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent1");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablinks1");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(
+                " activetab",
+                ""
+            );
+        }
+        document.getElementById(tabName).style.display = "block";
+        document.getElementById(btnName).className += " activetab";
+    }
+
+    function MyAlert(message) {
+        $.alert({
+            title: "Alert!",
+            useBootstrap: false,
+            content: message,
+        });
+    }
+
+    function showToast(message, type) {
+        // type: 'success' | 'danger' | 'info' | 'warning'
+        const toastEl = document.getElementById("mainToast");
+        const toastBody = document.getElementById("toastBody");
+        toastBody.textContent = message;
+
+        // Remove all type classes, add selected
+        toastEl.className = "toast align-items-center border-0";
+        switch (type) {
+            case "success":
+                toastEl.classList.add("text-bg-success");
+                break;
+            case "danger":
+                toastEl.classList.add("text-bg-danger");
+                break;
+            case "warning":
+                toastEl.classList.add("text-bg-warning");
+                break;
+            case "info":
+            default:
+                toastEl.classList.add("text-bg-primary");
+                break;
+        }
+        // Bootstrap 5 Toast instance
+        var toast = bootstrap.Toast.getOrCreateInstance(toastEl);
+        toast.show();
+    }
+
+    // --- Utility: Clear and hide form after successful enroll ---
+    function resetAddCardForm() {
+        $("#addCardForm")[0].reset();
+        $("#addCardForm").slideUp(160);
+        $("#addCardBtnWrap").show();
+    }
+
+</script>
+<script src="/assets/js/srcsdkTester.js"></script>
+<script src="/assets/js/cardUI.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+</body>
+
+</html>

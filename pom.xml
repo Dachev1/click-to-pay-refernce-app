@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.4.0</version>
+		<relativePath/>
+	</parent>
+
+	<groupId>com.mastercard.mcs</groupId>
+	<artifactId>clicktopay-reference-app</artifactId>
+	<version>1.0.0</version>
+	<name>clicktopay-reference-app</name>
+	<description>Reference Application for Mastercard Checkout Solutions Click to Pay API</description>
+
+	<properties>
+		<java.version>17</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<spring-cloud.version>2023.0.4</spring-cloud.version>
+
+		<oauth1-signer.version>1.5.3</oauth1-signer.version>
+		<client-encryption.version>1.8.5</client-encryption.version>
+		<nimbus-jose-jwt.version>10.3.1</nimbus-jose-jwt.version>
+		<okhttp.version>4.12.0</okhttp.version>
+		<logging-interceptor.version>4.12.0</logging-interceptor.version>
+		<gson-fire.version>1.9.0</gson-fire.version>
+		<jackson-databind-nullable.version>0.2.6</jackson-databind-nullable.version>
+		<openapi-generator-cli.version>7.3.0</openapi-generator-cli.version>
+		<jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-dependencies</artifactId>
+			<version>${spring-cloud.version}</version>
+			<type>pom</type>
+			<scope>import</scope>
+		</dependency>
+
+		<!-- Spring dependencies -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<!-- Lombok -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<!-- Also add Jakarta EL dependency (required for expression language support) -->
+		<dependency>
+			<groupId>org.glassfish</groupId>
+			<artifactId>jakarta.el</artifactId>
+			<version>4.0.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>jakarta.ws.rs</groupId>
+			<artifactId>jakarta.ws.rs-api</artifactId>
+			<version>3.1.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.mastercard.developer</groupId>
+			<artifactId>oauth1-signer</artifactId>
+			<version>${oauth1-signer.version}</version> <!-- See: https://github.com/Mastercard/oauth1-signer-java/releases -->
+		</dependency>
+
+		<dependency>
+            <groupId>com.mastercard.developer</groupId>
+            <artifactId>client-encryption</artifactId>
+            <version>${client-encryption.version}</version>
+        </dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt -->
+        <dependency>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+            <version>${nimbus-jose-jwt.version}</version>
+        </dependency>
+
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>${okhttp.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>logging-interceptor</artifactId>
+			<version>${logging-interceptor.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.gsonfire</groupId>
+			<artifactId>gson-fire</artifactId>
+			<version>${gson-fire.version}</version>
+		</dependency>
+
+		<!-- Databind nullable -->
+		<dependency>
+			<groupId>org.openapitools</groupId>
+			<artifactId>jackson-databind-nullable</artifactId>
+			<version>${jackson-databind-nullable.version}</version>
+		</dependency>
+
+		<!-- Jakarta Validation API -->
+		<dependency>
+			<groupId>jakarta.validation</groupId>
+			<artifactId>jakarta.validation-api</artifactId>
+		</dependency>
+
+		<!-- JUnit 5 dependencies -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Spring Boot Test (exclude vintage engine) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<!-- OpenAPI Generator plugin -->
+			<plugin>
+				<groupId>org.openapitools</groupId>
+				<artifactId>openapi-generator-maven-plugin</artifactId>
+				<version>${openapi-generator-cli.version}</version>
+				<executions>
+					<execution>
+						<id>merchant-api</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputSpec>${project.basedir}/src/main/resources/specifications/mcs-merchant-registration-api-swagger.yaml</inputSpec>
+							<generatorName>java</generatorName>
+							<output>${project.build.directory}/generated-sources/openapi</output>
+							<configOptions>
+								<additionalModelTypeAnnotations>
+									@com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+									@com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
+								</additionalModelTypeAnnotations>
+								<sourceFolder>src/gen/java/main/merchantregistration</sourceFolder>
+								<modelPackage>com.mcs.clicktopay.merchantregistration.model</modelPackage>
+								<apiPackage>com.mcs.clicktopay.merchantregistration.api</apiPackage>
+								<invokerPackage>com.mcs.clicktopay.merchantregistration.invoker</invokerPackage>
+								<disallowAdditionalPropertiesIfNotPresent>false</disallowAdditionalPropertiesIfNotPresent>
+								<useJakartaEe>true</useJakartaEe>
+							</configOptions>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>checkout-api</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<phase>generate-sources</phase>
+						<configuration>
+							<inputSpec>${project.basedir}/src/main/resources/specifications/c2p-checkout-api-swagger.yaml</inputSpec>
+							<generatorName>java</generatorName>
+							<output>${project.build.directory}/generated-sources/openapi</output>
+							<configOptions>
+								<additionalModelTypeAnnotations>
+									@com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+									@com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
+								</additionalModelTypeAnnotations>
+								<sourceFolder>src/gen/java/main/checkout</sourceFolder>
+								<modelPackage>com.mcs.clicktopay.checkout.model</modelPackage>
+								<apiPackage>com.mcs.clicktopay.checkout.api</apiPackage>
+								<invokerPackage>com.mcs.clicktopay.checkout.invoker</invokerPackage>
+								<disallowAdditionalPropertiesIfNotPresent>false</disallowAdditionalPropertiesIfNotPresent>
+								<useJakartaEe>true</useJakartaEe>
+							</configOptions>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>confirmations-api</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<phase>generate-sources</phase>
+						<configuration>
+							<inputSpec>${project.basedir}/src/main/resources/specifications/confirmations-api-swagger.yaml</inputSpec>
+							<generatorName>java</generatorName>
+							<output>${project.build.directory}/generated-sources/openapi</output>
+							<configOptions>
+								<additionalModelTypeAnnotations>
+									@com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+									@com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
+								</additionalModelTypeAnnotations>
+								<sourceFolder>src/gen/java/main/confirmations</sourceFolder>
+								<modelPackage>com.mcs.clicktopay.confirmations.model</modelPackage>
+								<apiPackage>com.mcs.clicktopay.confirmations.api</apiPackage>
+								<invokerPackage>com.mcs.clicktopay.confirmations.invoker</invokerPackage>
+								<disallowAdditionalPropertiesIfNotPresent>false</disallowAdditionalPropertiesIfNotPresent>
+								<useJakartaEe>true</useJakartaEe>
+							</configOptions>
+						</configuration>
+					</execution>
+
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<phase>prepare-package</phase>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

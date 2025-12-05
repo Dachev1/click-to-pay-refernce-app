@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>MCS Click To Pay - Confirmation API </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8" />
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/fontawesome/css/all.min.css" />
+
+
+    <script src="/assets/js/jquery.min.js"></script>
+    <script src="/assets/js/jquery.validate.min.js"></script>
+
+    <script src="/assets/js/environment.js"></script>
+
+    <script src="/assets/js/confirmation.js"></script>
+     <script src="/assets/js/common.js"></script>
+
+
+    <!-- Font Awesome CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link rel="icon" type="image/svg" href="/assets/images/favicon.svg">
+</head>
+
+<body>
+    <div class="container-fluid p-0">
+        <!-- Main Header Start Here -->
+       <nav class="mc-oba-header">
+            <div class="mc-oba-header-left">
+                <img src="/assets/images/mc_symbol_opt_73_3x.png" alt="Mastercard" class="mc-oba-logo" />
+                <a href="https://developer.mastercard.com/mastercard-checkout-solutions/documentation/use-cases/click-to-pay/"
+                    class="mc-oba-developers-link" target="_blank">
+                    developers<i class="fa-solid fa-arrow-up-right-from-square"></i>
+
+                </a>
+            </div>
+            <div class="mc-oba-header-center">
+                <span class="mc-oba-header-app">REFERENCE APP</span>
+                <span class="mc-oba-header-title">MCS - Click to Pay</span>
+            </div>
+            <div class="mc-oba-header-right">
+                <a href="https://developer.mastercard.com/mastercard-checkout-solutions/documentation/api-reference/apis/"
+                    class="mc-oba-github-link" target="_blank">
+                    API Reference
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+            </div>
+        </nav>
+        <!-- Main Header End Here -->
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mt-0 mb-0 api-form-box">
+            <!-- API Name Header Start Here -->
+            <div class="row mb-3 api-name-border pb-3">
+                <div class="col-xl-1 col-lg-1 col-md-1 col-sm-1 col-2 d-flex align-items-center">
+                    <a href="/" class="text-decoration-none">
+                        <img class="back-logo" src="/assets/images/back_icon@2x.png" alt="Back Logo" />
+                    </a>
+                </div>
+                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11 col-10 d-flex align-items-center justify-content-center p-0">
+                    <span class="api-name-label"> MCS Click To Pay - Confirmation API </span>
+                </div>
+            </div>
+            <!-- API Name Header End Here -->
+
+
+             <div class="container-fluid p-0 pt-4 pb-0">
+                <h2 class="mc-page-title">Click To Pay Confirmation</h2>
+                <div class="mc-page-subtitle">Perform the Click To Pay Confirmation</div>
+
+                <span class="mb-3 styled-line"></span>
+            </div>
+            <div class="content">
+                <form id="confirmation-form">
+                    <input type="hidden" id="actionMode" value="ADD" />
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="xSrcCxFlowId">X-Src-Cx-Flow-Id:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:<br>Header</b><br>Optional. The X-SRC-CX-FLOW-ID ensures to direct all calls from the same client to the same server and maintains session affinity. For the first API request, add the value of srcCorrelationId in X-SRC-CX-FLOW-ID field. For subsequent requests, use the X-SRC-CX-FLOW-ID returned in the response for the initial API call.<br><br>Example: 39a9af3f-e27c-49f2-b924-26b74938d013<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="xSrcCxFlowId" name="xSrcCxFlowId" class="form-control" value="">
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="srcClientId">SRC Client Id:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Required. pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$ A unique identifier assigned by Mastercard during onboarding which signifies the responsible party Integrating to Mastercard Checkout Solutions (MCS).<br><br>Required: True<br><br>Example: eccbf087-f159-4d69-b31d-00bec75c0474<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="srcClientId" name="srcClientId" class="form-control"
+                                value="" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="srcDpaId">SRC DPA Id:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. DPA Identifier provided during onboarding for the DPA accessing the service. Optional parameter but is validated when a value is provided.<br><br>Required: True<br><br>Example: f0589e4f-10f3-4e2e-bab6-d22a3de576c0_ef6399d7-98d5-46aa-a50c-bbcf7a7fa846<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="srcDpaId" name="srcDpaId" class="form-control"
+                                value="">
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="srcCorrelationId">SRC Correlation Id:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Required. pattern: ^([0-9a-f]{8}.)?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$ Correlation ID for this transaction. If available within the present checkout session (e.g. received in an earlier API response during the present session), then it must be provided, otherwise a new checkout session will be initiated.<br><br>Required: True<br><br>Example: 779165e0-1905-4edd-89fa-be46497b5044<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="srcCorrelationId" name="srcCorrelationId" class="form-control"
+                                value="860cf27e-699d-4071-891c-3902a7406760" required>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="serviceId">Service Id:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. Identifies a relevant / requested service (program) supported by the Click to Pay System. Use SRC if operating under the common button program (other values are reserved for future use in different scenarios, for example when operating via a commerce platform).<br><br>Example: SRC<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="serviceId" name="serviceId" class="form-control" value="">
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="srciTransactionId">SRC Transaction Id:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$ Transaction reference generated by SRCI<br><br>Example: 779165e0-1905-4edd-89fa-be46497b5044<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="srciTransactionId" name="srciTransactionId" class="form-control"
+                                value="779165e0-1905-4edd-89fa-be46497b5044">
+                        </div>
+                    </div>
+
+                    <h3 class="">Confirmation Data</h3>
+                    <span class="mb-3 styled-line"></span>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="checkoutEventType">Checkout Event Type:
+                                <span data-toggle="tooltip" data-html="true" title="<b>Info:</b><br>Required. Type of event associated with the checkout. Valid values are:
+                                <br>01 - Authorise
+                                <br>02 - Capture
+                                <br>03 - Refund
+                                <br>04 - Cancel
+                                <br>05 - Fraud
+                                <br>06 - Chargeback
+                                <br>07 - Other
+                                <br><br>Example: 01
+                                <br><br>Required: True<br><br>Max Length: 2<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <select id="checkoutEventType" name="checkoutEventType" required class="form-control"
+                                value="01"></select>
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="checkoutEventStatus">Checkout Event Status:
+                                <span data-toggle="tooltip" data-html="true" title="<b>Info:</b><br>Required. Event type associated with the order. Valid values are:
+                                <br>01 - Created
+                                <br>02 - Confirmed
+                                <br>03 - Cancelled
+                                <br>04 - Fraud Cancelled
+                                <br>05 - Others
+                                <br><br>Example: 01
+                                <br><br>Required: True<br><br>Max Length: 2<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <select id="checkoutEventStatus" name="checkoutEventStatus" required class="form-control"
+                                value="01"></select>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="confirmationStatus">Confirmation Status:
+                                <span data-toggle="tooltip" data-html="true" title="<b>Info:</b><br>Optional. Status of the event as provided by the SRC Initiator in the confirmation message. Valid values are
+                                <br>01 - Success
+                                <br>02 - Failure
+                                <br>03 - Others
+                                <br><br>Example: 01
+                                <br><br>Max Length: 2<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <select id="confirmationStatus" name="confirmationStatus" class="form-control"
+                                value="01"></select>
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="confirmationReason">Confirmation Reason:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. pattern: ^[0-9a-zA-Z ,;!?.-_]*$ Reason for the event associated with the order.<br><br>Max Length: 64<br><br>Example: Order Successfully Created<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="confirmationReason" name="confirmationReason" class="form-control"
+                                value="Order Successfully Created">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="confirmationTimestamp">Confirmation Timestamp:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Required. pattern: ^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9]).([0-9][0-9][0-9])?(Z)?$ Date and time (UTC) corresponding to the completion of confirmation event by the SRC Initiator. UTC ISO 8601 <br><br>Required: True<br><br>Max Length: 25<br><br>Example: 2025-02-26T10:31:47Z<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="confirmationTimestamp" name="confirmationTimestamp"
+                                class="form-control" value="2025-02-26T10:31:47Z" required>
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="networkAuthorizationCode">Network Authorization Code:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. Authorisation code associated with an approved transaction.<br><br>Example: 6019503940020912<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="networkAuthorizationCode" name="networkAuthorizationCode"
+                                class="form-control" value="6019503940020912">
+                        </div>
+                    </div>
+
+                     <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="networkTransactionIdentifier">Network Transaction Identifier:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. pattern: ^[ A-Za-z0-9_-]*$ The unique authorisation related tracing value assigned by a Payment Network and provided in an authorisation response. Required only when checkoutEventType=01. If checkoutEventType=01 and the value of networkTransactionIdentifier is unknown, please pass UNAVLB.<br><br>Max Length: 25<br><br>Example: 60195039400209<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="networkTransactionIdentifier" name="networkTransactionIdentifier"
+                                class="form-control" value="60195039400209">
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="paymentNetworkReference">Payment Network Reference:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Optional. pattern: ^[ A-Za-z0-9_-]*$ Transaction ID provided by a Payment Network after the authorisation is complete.<br><br>Max Length: 25<br><br>Example: 543215465132123140<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="paymentNetworkReference" name="paymentNetworkReference"
+                                class="form-control" value="543215465132123140">
+                        </div>
+                    </div>
+
+
+                    <h3 class="">Assurance Data</h3>
+                    <span class="mb-3 styled-line"></span>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="verificationType">Verification Type:
+                                <span data-toggle="tooltip" data-html="true" title="<b>Info:</b><br>Optional. Type of the verification data. Valid value includes
+                                <br>CARDHOLDER
+                                <br><br>Example: CARDHOLDER
+                                <br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <select id="verificationType" name="verificationType" class="form-control"
+                                value="CARDHOLDER"></select>
+                        </div>
+
+                         <div class="col-md-6 form-group">
+                            <label for="verificationEntity">Verification Entity:
+                                <span data-toggle="tooltip" data-html="true" title="<b>Info:</b><br>Optional. Entity performing card verification. Valid value includes
+                                <br>03 - SRCPI
+                                <br><br>Example: 3
+                                <br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <select id="verificationEntity" name="verificationEntity" class="form-control"
+                                value="3"></select>
+                        </div>
+
+                    </div>
+
+                     <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="verificationMethod">Verification Method:
+                                <span data-toggle="tooltip" data-html="true" title="<b>Info:</b><br>Optional. Card Issuer verification of the Cardholder. Valid values are
+                                <br>01 - Use of a 3-D Secure ACS
+                                <br>04 - A shared secret between the Card Issuer and the Cardholder such as One Time Passcode (OTP), activation code
+                                <br><br>Example: 02
+                                <br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <select id="verificationMethod" name="verificationMethod" class="form-control"
+                                value="01"></select>
+                        </div>
+
+                         <div class="col-md-6 form-group">
+                            <label for="verificationResults">Verification Results:
+                                <span data-toggle="tooltip" data-html="true" title="<b>Info:</b><br>Optional. Verification status of a PAN. Valid values are:
+                                <br>01 - Verified
+                                <br>03 - Not performed
+                                <br>04 - Not Required
+                                <br><br>Example: 2
+                                <br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <select id="verificationResults" name="verificationResults" class="form-control"
+                                value="01"></select>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="verificationEvent">Verification Event:
+                                <span data-toggle="tooltip" data-html="true" title="<b>Info:</b><br>Optional. Indicates the event where verification occurred. Valid value includes
+                                <br>02 - Add card/Card enrollment
+                                <br><br>Example: 2
+                                <br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <select id="verificationEvent" name="verificationEvent" class="form-control"
+                                value="02"></select>
+                        </div>
+                    </div>
+
+                    <h3 class="">Assurance Data</h3>
+                    <span class="mb-3 styled-line"></span>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="transactionAmount">Transaction Amount:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Required. Amount of the transaction.<br><br>Required: Yes<br><br>Max Length: 18<br><br>Example: 150.00<br><br>Type: Number">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="number" id="transactionAmount" name="transactionAmount" class="form-control" value="10" required>
+                        </div>
+
+                         <div class="col-md-6 form-group">
+                            <label for="transactionCurrencyCode">Transaction Currency Code:
+                                <span data-toggle="tooltip" data-html="true"
+                                    title="<b>Info:</b><br>Required. Currency in which the transaction amount is expressed. Format is ISO 4217 standard alpha-3 code.<br><br>Required: Yes<br><br>Example: USD<br><br>Type: String">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="transactionCurrencyCode" name="transactionCurrencyCode" class="form-control" value="USD" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn submit-btn">Submit</button>
+                    <span class="mb-3 mt-5 styled-line"></span>
+                </form>
+
+                <div class="api-object-card mt-4" style="display: none;">
+                    <div class="api-object-header">
+                        <span class="api-object-icon"><i class="fa-solid fa-arrow-right"></i></span>
+                        Request Headers
+                        <button type="button" class="copy-json-btn" data-target="#requestHeadersContent" title="Copy">
+                            <i class="fa fa-copy"></i>
+                        </button>
+                    </div>
+                    <pre class="api-json-block" id="requestHeadersContent"></pre>
+                </div>
+
+                <div class="api-object-card mt-4">
+                    <div class="api-object-header">
+                        <span class="api-object-icon"><i class="fa-solid fa-code"></i></span>
+                        Request Object
+                        <button type="button" class="copy-json-btn" data-target="#requestBodyContent" title="Copy">
+                            <i class="fa fa-copy"></i>
+                        </button>
+                    </div>
+                    <pre class="api-json-block" id="requestBodyContent"></pre>
+                </div>
+
+                <div class="api-object-card mt-4">
+                    <div class="api-object-header">
+                        <span class="api-object-icon"><i class="fa-solid fa-code-branch"></i></span>
+                        Response Object
+                        <button type="button" class="copy-json-btn" data-target="#responseContent" title="Copy">
+                            <i class="fa fa-copy"></i>
+                        </button>
+                    </div>
+                    <pre class="api-json-block" id="responseContent"></pre>
+                </div>
+
+                <div class="api-object-card mt-4">
+                    <div class="api-object-header">
+                        <span class="api-object-icon"><i class="fa-solid fa-server"></i></span>
+                        Response Headers
+                        <button type="button" class="copy-json-btn" data-target="#mastercardResponseHeadersContent"
+                            title="Copy">
+                            <i class="fa fa-copy"></i>
+                        </button>
+                    </div>
+                    <pre class="api-json-block" id="mastercardResponseHeadersContent"></pre>
+                </div>
+            </div>
+        </div>
+        <div id="spinner" class=""></div>
+        <!-- Bootstrap JS and dependencies -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+        <script>
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip();
+            });
+        </script>
+</body>
+
+</html>
