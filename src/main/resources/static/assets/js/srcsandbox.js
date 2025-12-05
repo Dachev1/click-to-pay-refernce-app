@@ -147,7 +147,7 @@ function init() {
         dpaTransactionOptions: dpaTransactionOptions, 
         dpaData: {
             dpaPresentationName: "Moovetshop",
-            dpaUri: window.location.origin, // Dynamically use current domain
+            dpaUri: SERVER_URL, 
             dpaName: "Moovetshop",
         },
     };
