@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +18,6 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/srci")
-@CrossOrigin(origins = "*")
 public class MerchantRegistrationController {
 
     private final MasterCardC2PMerchantRegistrationService masterCardC2PMerchantRegistrationService;
