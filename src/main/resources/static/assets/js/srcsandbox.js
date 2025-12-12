@@ -146,9 +146,9 @@ function init() {
         srciTransactionId: $("#transactionid").val(), 
         dpaTransactionOptions: dpaTransactionOptions, 
         dpaData: {
-            dpaPresentationName: "Moovetshop",
-            dpaUri: SERVER_URL, 
-            dpaName: "Moovetshop",
+            dpaPresentationName: "Briklabs",
+            dpaUri: "https://mtf.moovetshop.com",
+            dpaName: "Briklabs",
         },
     };
 

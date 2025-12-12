@@ -62,7 +62,6 @@ logs/
 log/
 
 # Sensitive Files - Keys and Certificates
-*.p12
 *.pem
 *.key
 *.jks
