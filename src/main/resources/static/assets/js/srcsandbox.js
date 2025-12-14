@@ -147,7 +147,7 @@ function init() {
         dpaTransactionOptions: dpaTransactionOptions, 
         dpaData: {
             dpaPresentationName: "Briklabs",
-            dpaUri: "https://mtf.moovetshop.com",
+            dpaUri: "https://briklabs.com",
             dpaName: "Briklabs",
         },
     };
